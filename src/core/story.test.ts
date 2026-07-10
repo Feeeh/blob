@@ -21,15 +21,17 @@ describe('StoryEngine', () => {
     expect(calls).toEqual(['step', 'sleep:1', 'move:2,3', 'attach', 'circle', 'say:Hi', 'detach', 'end']);
   });
 
-  it('skips an active speech line and does not run following steps', async () => {
+  it('ends a skipped story by detaching once', async () => {
     let resolveSpeech: (() => void) | null = null;
-    const detach = vi.fn();
+    const detach = vi.fn(async () => {});
     const skipSpeech = vi.fn(() => resolveSpeech?.());
+    const onEnd = vi.fn();
     const engine = new StoryEngine({
       sleep: async () => {},
       say: () => new Promise((resolve) => { resolveSpeech = resolve; }),
       moveTo: async () => {}, attachTo: async () => {}, circle: async () => {}, detach,
       skipSpeech,
+      onEnd,
     }, [{ say: 'Wait', detach: true }, { detach: true }]);
 
     const playing = engine.play();
@@ -38,6 +40,7 @@ describe('StoryEngine', () => {
     await playing;
 
     expect(skipSpeech).toHaveBeenCalledOnce();
-    expect(detach).not.toHaveBeenCalled();
+    expect(detach).toHaveBeenCalledOnce();
+    expect(onEnd).toHaveBeenCalledOnce();
   });
 });

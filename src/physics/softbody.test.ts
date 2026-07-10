@@ -75,19 +75,31 @@ describe('SoftBody', () => {
     expect(state.points[0]).toEqual({ x: 90, y: 90 });
   });
 
-  it('samples and snaps a hollow ring around a target rectangle', () => {
+  it('samples and snaps a hollow ring fully outside a target rectangle', () => {
     const body = new SoftBody(8, 10, '#8b5cf6', true);
     const rect = { left: 100, top: 80, width: 120, height: 60, right: 220, bottom: 140 } as DOMRectReadOnly;
-    const points = sampleRoundedRect(rect, 10, 8);
-    body.setRingAround(rect, 10);
+    // Requested padding 10 plus half the 8px stroke keeps the stroke clear of the rect.
+    const points = sampleRoundedRect(rect, 14, 8);
+    body.setRingAround(rect, { padding: 10, strokeWidth: 8 });
 
     const state = body.update(0);
 
     expect(points).toHaveLength(8);
-    expect(points[0]).toEqual({ x: 114, y: 70 });
+    expect(points[0]).toEqual({ x: 110, y: 66 });
     expect(state.shape).toBe('ring');
     expect(state.center).toEqual({ x: 160, y: 110 });
     expect(state.points).toEqual(points);
+  });
+
+  it('keeps ring points wobbling in place when motion is enabled', () => {
+    const body = new SoftBody(8, 10);
+    const rect = { left: 100, top: 80, width: 120, height: 60, right: 220, bottom: 140 } as DOMRectReadOnly;
+    body.setRingAround(rect, 10);
+    body.update(0);
+    const first = body.update(0.05).points.map((point) => ({ ...point }));
+    const second = body.update(0.05).points;
+
+    expect(second).not.toEqual(first);
   });
 
   it('rejects invalid point counts and radii', () => {

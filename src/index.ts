@@ -103,8 +103,8 @@ export function createBlob(options: BlobOptions = {}): BlobController {
   const dismissButton = document.createElement('button');
   dismissButton.type = 'button';
   dismissButton.className = 'blob-dismiss-button';
-  dismissButton.textContent = 'x';
   dismissButton.setAttribute('aria-label', 'Dismiss Blob');
+  dismissButton.append(dismissCross());
   visualLayer.append(dismissButton);
 
   const body = new SoftBody(pointCount, size, color, reducedMotion, physics);
@@ -173,14 +173,14 @@ export function createBlob(options: BlobOptions = {}): BlobController {
   };
 
   const waitForMotion = (): Promise<void> => {
-    if (motion.landed || motion.kind === 'idle' && body.isAtRest) return Promise.resolve();
+    if (motion.landed || motion.kind === 'idle' && body.isCenterAtRest) return Promise.resolve();
     return new Promise((resolve) => {
       motionWaiter = resolve;
     });
   };
 
   const finishMotion = (): void => {
-    if (motion.landed || motion.target === null || !body.isAtRest) {
+    if (motion.landed || motion.target === null || !body.isCenterAtRest) {
       return;
     }
 
@@ -233,15 +233,22 @@ export function createBlob(options: BlobOptions = {}): BlobController {
     const snapshot = body.update(dtSeconds);
     lastCenter = snapshot.center;
     renderer.render(snapshot);
-    bubble?.follow(bubbleAnchor(snapshot, size));
+    const bounds = bubbleAnchor(snapshot, size);
+    bubble?.follow(bounds);
     Object.assign(hitTarget.style, {
       left: `${Math.round(snapshot.center.x - size)}px`,
       top: `${Math.round(snapshot.center.y - size)}px`,
       width: `${size * 2}px`,
       height: `${size * 2}px`,
     });
-    dismissButton.style.left = `${Math.round(snapshot.center.x + size - 10)}px`;
-    dismissButton.style.top = `${Math.round(snapshot.center.y - size - 10)}px`;
+    if (options.dismissible !== false) {
+      positionDismissButton(
+        dismissButton,
+        bounds,
+        bubble?.visibleRect ?? null,
+        motion.kind === 'idle' || motion.kind === 'rest',
+      );
+    }
 
     if (motion.kind === 'idle' && state.name === 'moving' && body.isCenterAtRest) {
       state.transition('idle');
@@ -521,6 +528,7 @@ export function createBlob(options: BlobOptions = {}): BlobController {
       dragTarget = null;
       if (state.name === 'dragged') state.transition('idle');
       motion = { kind: 'idle', target: null, direction: { x: 0, y: 0 }, landed: false, attachedElement: null, attachEmitted: false };
+      resolveMotion();
     },
   );
   if (options.draggable !== false) drag.enable(hitTarget);
@@ -600,6 +608,65 @@ function viewportHeight(): number {
 
 function isResizableRenderer(renderer: Renderer): renderer is Renderer & { resize(): void } {
   return typeof renderer.resize === 'function';
+}
+
+/** A black X over a thicker white X, so it stays readable on any background. */
+function dismissCross(): SVGSVGElement {
+  const namespace = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(namespace, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [color, width] of [['#ffffff', 9], ['#000000', 4.5]] as const) {
+    const path = document.createElementNS(namespace, 'path');
+    path.setAttribute('d', 'M6 6 18 18 M18 6 6 18');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', String(width));
+    path.setAttribute('stroke-linecap', 'square');
+    path.setAttribute('fill', 'none');
+    svg.append(path);
+  }
+  return svg;
+}
+
+/**
+ * Pin the dismiss button to the body's top-right corner, flipping below the
+ * content when the top edge is off-screen, and always clamped to the viewport.
+ */
+function positionDismissButton(
+  button: HTMLButtonElement,
+  body: DOMRectReadOnly,
+  bubbleRect: DOMRectReadOnly | null,
+  standing: boolean,
+): void {
+  // A silent Blob standing in its corner needs no X; morphing/travelling always shows it.
+  const hidden = standing && bubbleRect === null;
+  button.hidden = hidden;
+  if (hidden) {
+    return;
+  }
+
+  const margin = 4;
+  const gap = 4;
+  const buttonSize = button.offsetWidth || 20;
+  let left: number;
+  let top: number;
+  if (standing && bubbleRect !== null && bubbleRect.top < body.top) {
+    // Standing and speaking: tuck the X under the bubble, on Blob's free left side.
+    left = body.left - buttonSize - gap;
+    top = bubbleRect.bottom + gap;
+  } else {
+    // Morphed or travelling: sit fully above the content, or beside its
+    // bottom-right corner when the top is off-screen.
+    const fitsAbove = body.top - buttonSize - gap >= margin;
+    top = fitsAbove ? body.top - buttonSize - gap : body.bottom - buttonSize / 2;
+    left = fitsAbove ? body.right - buttonSize / 2 : body.right + gap;
+  }
+  button.style.left = `${Math.round(clampToRange(left, margin, viewportWidth() - buttonSize - margin))}px`;
+  button.style.top = `${Math.round(clampToRange(top, margin, viewportHeight() - buttonSize - margin))}px`;
+}
+
+function clampToRange(value: number, minimum: number, maximum: number): number {
+  return Math.min(Math.max(value, minimum), Math.max(minimum, maximum));
 }
 
 function bubbleAnchor(

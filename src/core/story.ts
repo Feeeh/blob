@@ -45,7 +45,8 @@ export class StoryEngine {
         if (this.skipping) break;
         if (step.detach) await this.host.detach();
       }
-      if (!this.skipping) this.host.onEnd?.();
+      if (this.skipping) await this.host.detach();
+      this.host.onEnd?.();
     } finally {
       this.running = false;
       this.paused = false;

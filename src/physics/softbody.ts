@@ -12,6 +12,8 @@ const DEFAULT_BOB_AMPLITUDE = 6;
 const DEFAULT_BOB_FREQUENCY = 1.8;
 const DEFAULT_BREATHE_FREQUENCY = 2.4;
 const DEFAULT_BREATHE_RATIO = 0.06;
+/** Ring min-dimension (px) at which the in-place wobble reaches full amplitude. */
+const WOBBLE_FULL_SIZE = 320;
 const MAX_DT_SECONDS = 0.1;
 
 interface PointSprings {
@@ -38,6 +40,8 @@ export class SoftBody {
   private elapsedSeconds = 0;
   private mode: 'idle' | 'moving' | 'custom' = 'idle';
   private shape: 'solid' | 'ring' = 'solid';
+  private customRest: Vec2[] | null = null;
+  private wobbleScale = 1;
 
   constructor(
     pointCount: number = DEFAULT_POINT_COUNT,
@@ -105,10 +109,6 @@ export class SoftBody {
     return this.centerX.isAtRest && this.centerY.isAtRest;
   }
 
-  get isAtRest(): boolean {
-    return this.isCenterAtRest && this.points.every((point) => point.x.isAtRest && point.y.isAtRest);
-  }
-
   /** Compress the perimeter toward the body center as it lands on a target. */
   squishTowards(direction: Vec2): void {
     const length = Math.hypot(direction.x, direction.y);
@@ -142,6 +142,8 @@ export class SoftBody {
     }
 
     this.mode = 'custom';
+    this.customRest = points.map((point) => ({ x: point.x, y: point.y }));
+    this.wobbleScale = 1;
     const snap = !this.initialized || this.reducedMotion;
     if (snap) {
       this.centerX.snap(center.x);
@@ -168,7 +170,9 @@ export class SoftBody {
   /** Expand the perimeter into a rounded rectangle around a target element. */
   setRingAround(rect: DOMRectReadOnly, options: BlobMorphOptions | number = {}): void {
     const morph = typeof options === 'number' ? { padding: options } : options;
-    const padding = nonNegativeFinite(morph.padding, this.radius * 0.4);
+    const strokeWidth = nonNegativeFinite(morph.strokeWidth, Math.max(8, this.radius * 0.55));
+    // Pad by half the stroke so the ring sits fully outside the target, not straddling its edge.
+    const padding = nonNegativeFinite(morph.padding, this.radius * 0.4) + strokeWidth / 2;
     const shape = morph.shape ?? 'rounded';
     const points = sampleOutline(
       rect,
@@ -181,12 +185,15 @@ export class SoftBody {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
     });
+    // Small targets get a calmer ripple: full wobble reads as flailing on a tight ring.
+    const minDimension = Math.min(rect.width, rect.height) + padding * 2;
+    this.wobbleScale = Math.min(1, Math.sqrt(minDimension / WOBBLE_FULL_SIZE));
     this.ringStyle = {
       color: morph.strokeColor ?? this.color,
       lineCap: morph.lineCap ?? 'round',
       lineJoin: morph.lineJoin ?? 'round',
       shape,
-      width: nonNegativeFinite(morph.strokeWidth, Math.max(8, this.radius * 0.55)),
+      width: strokeWidth,
     };
     this.shape = 'ring';
   }
@@ -232,8 +239,10 @@ export class SoftBody {
         this.centerY.value + bob,
         this.elapsedSeconds,
         this.reducedMotion,
-        isIdle,
+        true,
       );
+    } else if (this.mode === 'custom' && this.customRest !== null && !this.reducedMotion) {
+      this.wobbleCustomRest();
     }
 
     if (!this.reducedMotion) {
@@ -254,6 +263,27 @@ export class SoftBody {
       strokeWidth: this.ringStyle.width,
       morphShape: this.ringStyle.shape,
     };
+  }
+
+  /** Keep a morphed body alive: ripple each point radially around its rest slot. */
+  private wobbleCustomRest(): void {
+    const rest = this.customRest!;
+    const frequency = finiteNumber(this.physics.breatheFrequency, DEFAULT_BREATHE_FREQUENCY);
+    const amplitude = this.radius
+      * finiteNumber(this.physics.breatheAmplitude, DEFAULT_BREATHE_RATIO)
+      * this.wobbleScale;
+    const centerX = this.centerX.target;
+    const centerY = this.centerY.target;
+    for (let index = 0; index < this.pointCount; index += 1) {
+      const slot = rest[index]!;
+      const radialX = slot.x - centerX;
+      const radialY = slot.y - centerY;
+      const length = Math.hypot(radialX, radialY) || 1;
+      const offset = Math.sin(this.elapsedSeconds * frequency + index * 1.7) * amplitude;
+      const point = this.points[index]!;
+      point.x.target = slot.x + radialX / length * offset;
+      point.y.target = slot.y + radialY / length * offset;
+    }
   }
 
   private setPointTargets(

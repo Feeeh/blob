@@ -203,14 +203,14 @@ Each phase ends with something visible/testable. Do them in order.
 - [x] Handle target disappearing from DOM (graceful detach + `warn` event)
 - **Done when:** Blob travels to `#main-nav`, sticks while you scroll, returns home on detach.
 
-### Phase 5 — Expand & circle (Needs Claude review)
+### Phase 5 — Expand & circle (Claude reviewed)
 - [x] Rounded-rect outline sampler (rect + padding → N evenly-spaced points)
 - [x] `circle` behavior: remap rest positions, expand/retract choreography
 - [x] Keep tracking the rect while circling (scroll/resize)
 - [x] Bubble repositions to sit outside the ring while circling
 - **Done when:** Blob wraps around the demo's projects grid and snaps back on detach.
 
-### Phase 6 — Story engine + data-attributes (Needs Claude review)
+### Phase 6 — Story engine + data-attributes (Claude reviewed — skip() end-event fix applied)
 - [x] `core/story.ts`: async step queue; `sleep`; `say` waits for advance; skip/pause/resume
 - [x] Preserve the state invariant: target changes route through `moving`, even at zero distance
 - [x] `autoStart` + "already played" flag in localStorage
@@ -219,14 +219,14 @@ Each phase ends with something visible/testable. Do them in order.
 - [x] Vitest: queue ordering, sleep timing (fake timers), data-attr parsing
 - **Done when:** the full demo tour plays end-to-end from `demo/demo.ts`.
 
-### Phase 7 — Interactions (Needs Claude review)
+### Phase 7 — Interactions (Claude reviewed — drag/story deadlock fix applied)
 - [x] Click idle Blob = start story (demo default); click while speaking = advance
 - [x] `interact/poke.ts`: squish/jiggle impulse on the soft body
 - [x] `interact/drag.ts`: pointer capture, drag outside circling, then transition to idle and spring back home
 - [x] `interact/dismiss.ts`: minimize to a small restore chip; persisted; ARIA labels
 - **Done when:** all four interactions work on the demo without breaking a running story.
 
-### Phase 8 — Alternate renderers (Needs Claude review)
+### Phase 8 — Alternate renderers (Claude reviewed)
 - [x] `renderers/svg.ts`: same point ring → smooth `<path>`, CSS-themeable
 - [x] `renderers/css.ts`: single div, border-radius morph (documented: no circling — falls back to attach)
 - [x] Renderer conformance test: all renderers implement the contract

@@ -35,6 +35,11 @@ export class SpeechBubble {
     return this.typewriter?.isActive ?? false;
   }
 
+  /** Viewport rect of the visible bubble, or null while hidden. */
+  get visibleRect(): DOMRectReadOnly | null {
+    return this.element === null || this.element.hidden ? null : this.element.getBoundingClientRect();
+  }
+
   mount(host: HTMLElement): void {
     this.destroy();
 

@@ -3,11 +3,11 @@ import { defineBlobCharacter } from '../src/index';
 // This file is the whole character. Copy it into any app, change values, or
 // replace the renderer with your own object when the built-ins are not enough.
 export default defineBlobCharacter({
-  body: { color: '#8b5cf6', size: 48, points: 48 },
+  body: { color: '#8b5cf6', size: 32, points: 48 },
   physics: {
     stiffness: 170,
     bobAmplitude: 6,
-    breatheAmplitude: 0.06,
+    breatheAmplitude: 0.1,
   },
   bubble: {
     background: '#ffffff',
@@ -33,10 +33,10 @@ export default defineBlobCharacter({
     { sleep: 600 },
     { say: "Hi! I'm Blob - welcome to this portfolio." },
     { circle: '#main-menu', say: 'This whole menu is how visitors move around the site.' },
-    { attachTo: '#menu-home', attach: { side: 'bottom', gap: 6 }, say: 'Home brings visitors back to this introduction.' },
-    { attachTo: '#menu-projects', attach: { side: 'bottom', gap: 6 }, say: 'Projects jumps straight to the work.' },
-    { attachTo: '#menu-about', attach: { side: 'bottom', gap: 6 }, say: 'About explains the person and process behind the work.' },
-    { attachTo: '#menu-contact', attach: { side: 'bottom', gap: 6 }, say: 'Contact is where a visitor can get in touch.' },
+    { circle: '#menu-home', say: 'Home brings visitors back to this introduction.' },
+    { circle: '#menu-projects', say: 'Projects jumps straight to the work.' },
+    { circle: '#menu-about', say: 'About explains the person and process behind the work.' },
+    { circle: '#menu-contact', say: 'Contact is where a visitor can get in touch.' },
     { circle: '#home', say: 'This opening section gives people a quick reason to keep exploring.' },
     { circle: '#projects', say: 'Projects is where the portfolio makes its case with real examples.' },
     { circle: '#about', say: 'About adds the context, values, and story behind those examples.' },

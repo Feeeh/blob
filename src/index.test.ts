@@ -8,6 +8,8 @@ interface FakeElement {
   isConnected: boolean;
   offsetHeight: number;
   offsetWidth: number;
+  releasePointerCapture: ReturnType<typeof vi.fn>;
+  setPointerCapture: ReturnType<typeof vi.fn>;
   style: { setProperty: ReturnType<typeof vi.fn> };
   textContent: string | null;
   type: string;
@@ -20,10 +22,12 @@ interface FakeElement {
 }
 
 function installDom(): {
+  dragHandlers: Map<string, EventListener>;
   target: FakeElement;
   runAnchorFrame: (time: number) => void;
   triggerScroll: () => void;
 } {
+  const dragHandlers = new Map<string, EventListener>();
   let frame: FrameRequestCallback = () => {
     throw new Error('Anchor did not schedule a frame.');
   };
@@ -31,7 +35,7 @@ function installDom(): {
     throw new Error('Anchor did not register a scroll listener.');
   };
   const createElement = (): FakeElement => ({
-    addEventListener: vi.fn(),
+    addEventListener: vi.fn((event: string, listener: EventListener) => dragHandlers.set(event, listener)),
     append: vi.fn(),
     className: '',
     getBoundingClientRect: vi.fn(() => ({
@@ -46,9 +50,11 @@ function installDom(): {
     isConnected: true,
     offsetHeight: 48,
     offsetWidth: 120,
+    releasePointerCapture: vi.fn(),
     remove: vi.fn(),
     removeEventListener: vi.fn(),
     setAttribute: vi.fn(),
+    setPointerCapture: vi.fn(),
     style: { setProperty: vi.fn() },
     textContent: '',
     type: '',
@@ -64,6 +70,7 @@ function installDom(): {
     addEventListener: vi.fn(),
     body,
     createElement: vi.fn(() => createElement()),
+    createElementNS: vi.fn(() => createElement()),
     documentElement: { clientHeight: 600, clientWidth: 800 },
     head,
     querySelectorAll: vi.fn(() => []),
@@ -89,6 +96,7 @@ function installDom(): {
   });
 
   return {
+    dragHandlers,
     target,
     runAnchorFrame: (time) => frame(time),
     triggerScroll: () => scrollListener(),
@@ -100,6 +108,34 @@ afterEach(() => {
 });
 
 describe('createBlob movement controls', () => {
+  it('continues a story motion after a drag interrupt', async () => {
+    const { dragHandlers, target } = installDom();
+    const blob = createBlob({
+      bubble: false,
+      dismissible: false,
+      renderer: { destroy: vi.fn(), mount: vi.fn(), render: vi.fn() },
+      respectReducedMotion: false,
+      story: [{ attachTo: target as unknown as HTMLElement }],
+    });
+    const end = vi.fn();
+    blob.on('end', end);
+    blob.start();
+    await Promise.resolve();
+
+    const pointerDown = dragHandlers.get('pointerdown');
+    const pointerUp = dragHandlers.get('pointerup');
+    if (pointerDown === undefined || pointerUp === undefined) throw new Error('Blob did not register drag handlers.');
+    const event = { clientX: 200, clientY: 200, pointerId: 1 } as PointerEvent;
+    pointerDown(event);
+    pointerUp(event);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(end).toHaveBeenCalledOnce();
+    blob.destroy();
+  });
+
   it('moves, attaches, detaches on target loss, and cleans up in reduced motion', () => {
     const { target, runAnchorFrame, triggerScroll } = installDom();
     const frames: SoftBodyState[] = [];
