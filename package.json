@@ -28,7 +28,8 @@
     "build:library": "vite build && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:demo": "vite build --mode demo"
   },
   "devDependencies": {
     "typescript": "^5.8.0",
