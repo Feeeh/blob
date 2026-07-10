@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blob - demo portfolio</title>
+  <!-- CDNs are demo-only conveniences; the library itself makes no third-party requests. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    .pixel-font { font-family: 'Press Start 2P', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased">
+  <nav id="main-nav" class="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <a href="#" class="pixel-font text-sm text-purple-400">BLOB</a>
+      <div class="flex items-center gap-6">
+      <ul id="main-menu" class="flex gap-6 text-sm text-slate-300">
+        <li><a id="menu-home" href="#home" class="transition hover:text-purple-400">Home</a></li>
+        <li><a id="menu-projects" href="#projects" class="transition hover:text-purple-400">Projects</a></li>
+        <li><a id="menu-about" href="#about" class="transition hover:text-purple-400">About</a></li>
+        <li><a id="menu-contact" href="#contact" class="transition hover:text-purple-400">Contact</a></li>
+      </ul>
+      <select id="renderer-select" aria-label="Blob renderer" class="border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200">
+        <option value="canvas2d">Canvas</option>
+        <option value="svg">SVG</option>
+        <option value="css">CSS</option>
+      </select>
+      </div>
+    </div>
+  </nav>
+
+  <header id="home" class="mx-auto max-w-5xl px-6 py-24 text-center">
+    <p class="pixel-font mb-6 text-xs text-purple-400">PORTFOLIO</p>
+    <h1 class="text-5xl font-bold tracking-tight">Hi, I build things for the web.</h1>
+    <p class="mx-auto mt-6 max-w-xl text-slate-400">
+      This page is the living demo for <span class="text-purple-400">Blob</span>, the small purple
+      companion resting in the corner while you explore the portfolio.
+    </p>
+  </header>
+
+  <section id="projects" class="mx-auto max-w-5xl px-6 py-16">
+    <h2 class="pixel-font mb-10 text-sm text-purple-400">PROJECTS</h2>
+    <div class="grid gap-6 sm:grid-cols-3">
+      <article class="rounded-lg border border-slate-800 bg-slate-900 p-6 transition hover:border-purple-500">
+        <h3 class="font-semibold">Project One</h3>
+        <p class="mt-2 text-sm text-slate-400">A placeholder card so Blob has something to circle.</p>
+      </article>
+      <article class="rounded-lg border border-slate-800 bg-slate-900 p-6 transition hover:border-purple-500">
+        <h3 class="font-semibold">Project Two</h3>
+        <p class="mt-2 text-sm text-slate-400">Swap these for real portfolio pieces.</p>
+      </article>
+      <article class="rounded-lg border border-slate-800 bg-slate-900 p-6 transition hover:border-purple-500">
+        <h3 class="font-semibold">Project Three</h3>
+        <p class="mt-2 text-sm text-slate-400">Blob presents whatever you point it at.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="about" class="mx-auto max-w-5xl px-6 py-16">
+    <h2 class="pixel-font mb-6 text-sm text-purple-400">ABOUT</h2>
+    <p class="max-w-2xl text-slate-400">
+      Blob is an open-source GPL-3.0, zero-dependency TypeScript library. Its story, colors,
+      renderer, and behavior are configurable - see <code class="text-purple-300">blob.md</code>
+      for the full plan.
+    </p>
+  </section>
+
+  <footer id="contact" class="border-t border-slate-800">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-10 text-sm text-slate-500">
+      <span>Blob demo - GPL-3.0</span>
+      <a href="#home" class="transition hover:text-purple-400">Back to top</a>
+    </div>
+  </footer>
+
+  <script type="module" src="./demo.ts"></script>
+</body>
+</html>

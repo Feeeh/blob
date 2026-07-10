@@ -1,0 +1,38 @@
+{
+  "name": "blob",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A small purple soft-body companion that lives on your website, speaks in pixelated speech bubbles, and attaches to / circles the elements you point it at.",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "type": "module",
+  "main": "./dist/blob.umd.cjs",
+  "module": "./dist/blob.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/blob.js",
+      "require": "./dist/blob.umd.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src/assets/PRESS_START_2P_OFL.txt"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "build:library": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.0.0"
+  }
+}
