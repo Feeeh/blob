@@ -5,6 +5,7 @@ export class DismissBehavior {
     private readonly storageKey = 'blob',
     private readonly onDismiss: () => void,
     private readonly onRestore: () => void,
+    private readonly restoreLabel = 'Restore Blob',
   ) {}
 
   mount(host: HTMLElement): void {
@@ -12,7 +13,7 @@ export class DismissBehavior {
     chip.type = 'button';
     chip.className = 'blob-restore-chip';
     chip.textContent = 'B';
-    chip.setAttribute('aria-label', 'Restore Blob');
+    chip.setAttribute('aria-label', this.restoreLabel);
     chip.hidden = !this.isDismissed();
     chip.addEventListener('click', () => this.restore());
     host.append(chip);

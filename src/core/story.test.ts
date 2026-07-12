@@ -14,11 +14,29 @@ describe('StoryEngine', () => {
       onStep: () => calls.push('step'),
       onEnd: () => calls.push('end'),
     };
-    const engine = new StoryEngine(host, [{ sleep: 1, moveTo: { x: 2, y: 3 }, attachTo: '#a', circle: '#b', say: 'Hi', detach: true }]);
+    const engine = new StoryEngine(host, [{ sleep: 1, run: async () => { calls.push('run'); }, moveTo: { x: 2, y: 3 }, attachTo: '#a', circle: '#b', say: 'Hi', detach: true }]);
 
     await engine.play();
 
-    expect(calls).toEqual(['step', 'sleep:1', 'move:2,3', 'attach', 'circle', 'say:Hi', 'detach', 'end']);
+    expect(calls).toEqual(['step', 'sleep:1', 'run', 'move:2,3', 'attach', 'circle', 'say:Hi', 'detach', 'end']);
+  });
+
+  it('reports a throwing run() and continues the story', async () => {
+    const failure = new Error('nope');
+    const onRunError = vi.fn();
+    const say = vi.fn(async () => {});
+    const onEnd = vi.fn();
+    const engine = new StoryEngine({
+      sleep: async () => {}, say, moveTo: async () => {}, attachTo: async () => {}, circle: async () => {}, detach: async () => {},
+      onRunError,
+      onEnd,
+    }, [{ run: () => { throw failure; }, say: 'Still here' }]);
+
+    await engine.play();
+
+    expect(onRunError).toHaveBeenCalledWith(failure);
+    expect(say).toHaveBeenCalledWith('Still here');
+    expect(onEnd).toHaveBeenCalledWith(true);
   });
 
   it('ends a skipped story by detaching once', async () => {
@@ -41,6 +59,6 @@ describe('StoryEngine', () => {
 
     expect(skipSpeech).toHaveBeenCalledOnce();
     expect(detach).toHaveBeenCalledOnce();
-    expect(onEnd).toHaveBeenCalledOnce();
+    expect(onEnd).toHaveBeenCalledWith(false);
   });
 });

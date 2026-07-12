@@ -25,6 +25,11 @@ export interface Vec2 {
 export interface StoryStep {
   /** Milliseconds to wait before executing the rest of the step. */
   sleep?: number;
+  /**
+   * Custom page action (scroll, open UI, ...) awaited after `sleep` and
+   * before any movement, so targets exist and are visible when Blob travels.
+   */
+  run?: () => void | Promise<void>;
   /** Text to speak via the typewriter bubble; waits for click-to-advance. */
   say?: string;
   /** Travel to the element and stick to its nearest edge. */
@@ -144,6 +149,15 @@ export interface BlobOptions {
   respectReducedMotion?: boolean;
   /** localStorage namespace for dismiss + "story already played". Default: 'blob'. */
   storageKey?: string;
+  /** Accessible names for Blob's built-in controls; override to localize. */
+  labels?: {
+    /** Blob's focusable hit target. Default: 'Blob, your guide'. */
+    guide?: string;
+    /** The dismiss (X) button. Default: 'Dismiss Blob'. */
+    dismiss?: string;
+    /** The restore chip shown while dismissed. Default: 'Restore Blob'. */
+    restore?: string;
+  };
   /** z-index of Blob's layer. Default: 2147483000. */
   zIndex?: number;
   /** The story to play. data-blob-* steps found in the DOM are appended after it. */

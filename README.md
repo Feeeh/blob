@@ -83,7 +83,7 @@ For a one-off companion, pass the same object directly to `createBlob({ ... })`;
 
 ## Story Steps
 
-Steps run in this order: `sleep`, `moveTo`, `attachTo`, `circle`, `say`, then `detach`.
+Steps run in this order: `sleep`, `run`, `moveTo`, `attachTo`, `circle`, `say`, then `detach`. `run` is an optional `() => void | Promise<void>` callback for page actions (scrolling, opening UI) that must happen before Blob travels within the same step.
 
 ```html
 <section data-blob-order="1" data-blob-action="circle" data-blob-say="Featured work" data-blob-detach>

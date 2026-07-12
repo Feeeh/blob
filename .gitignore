@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 
 # Blob generated output
 demo-dist/
+
+# The library build is the published artifact consumed via file: dependencies
+# (npm does not run prepare for file: directory deps) - keep dist committed.
+!/dist/

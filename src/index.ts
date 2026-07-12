@@ -98,12 +98,12 @@ export function createBlob(options: BlobOptions = {}): BlobController {
   const hitTarget = document.createElement('button');
   hitTarget.type = 'button';
   hitTarget.className = 'blob-hit-target';
-  hitTarget.setAttribute('aria-label', 'Blob, your guide');
+  hitTarget.setAttribute('aria-label', options.labels?.guide ?? 'Blob, your guide');
   visualLayer.append(hitTarget);
   const dismissButton = document.createElement('button');
   dismissButton.type = 'button';
   dismissButton.className = 'blob-dismiss-button';
-  dismissButton.setAttribute('aria-label', 'Dismiss Blob');
+  dismissButton.setAttribute('aria-label', options.labels?.dismiss ?? 'Dismiss Blob');
   dismissButton.append(dismissCross());
   visualLayer.append(dismissButton);
 
@@ -535,12 +535,14 @@ export function createBlob(options: BlobOptions = {}): BlobController {
   const dismiss = new DismissBehavior(options.storageKey, () => {
     dismissed = true;
     visualLayer.hidden = true;
+    // An invisible Blob must not keep scrolling the page or running steps.
+    story?.skip();
     emitter.emit('dismiss', undefined);
   }, () => {
     dismissed = false;
     visualLayer.hidden = false;
     render(0);
-  });
+  }, options.labels?.restore);
   if (options.dismissible !== false) {
     dismiss.mount(host);
     dismissButton.addEventListener('click', () => dismiss.dismiss());
@@ -559,8 +561,13 @@ export function createBlob(options: BlobOptions = {}): BlobController {
     detach: async () => { controller.detach(); await waitForMotion(); },
     skipSpeech: () => { bubble?.advance(); bubble?.advance(); },
     onStep: (step) => emitter.emit('step', step),
-    onEnd: () => {
-      try { window.localStorage.setItem(storageKey, 'true'); } catch {}
+    onRunError: (error) => emitter.emit('warn', `A story step's run() failed: ${String(error)}`),
+    onEnd: (completed) => {
+      // Only a played-through story suppresses future autoStarts; an aborted
+      // tour should get another chance on the next visit.
+      if (completed) {
+        try { window.localStorage.setItem(storageKey, 'true'); } catch {}
+      }
       emitter.emit('end', undefined);
     },
   }, steps);
@@ -571,7 +578,7 @@ export function createBlob(options: BlobOptions = {}): BlobController {
     controller.destroy();
     throw error;
   }
-  if (!destroyed && options.autoStart && !wasStoryPlayed(storageKey)) controller.start();
+  if (!destroyed && !dismissed && options.autoStart && !wasStoryPlayed(storageKey)) controller.start();
   return controller;
 }
 

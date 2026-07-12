@@ -9,7 +9,10 @@ export interface StoryHost {
   detach(): Promise<void>;
   skipSpeech?(): void;
   onStep?(step: StoryStep): void;
-  onEnd?(): void;
+  /** completed is false when the story was skipped rather than played through. */
+  onEnd?(completed: boolean): void;
+  /** Called when a step's user-supplied run() throws; the story continues. */
+  onRunError?(error: unknown): void;
 }
 
 export class StoryEngine {
@@ -35,6 +38,14 @@ export class StoryEngine {
         this.host.onStep?.(step);
         if (step.sleep !== undefined) await this.host.sleep(step.sleep);
         if (this.skipping) break;
+        if (step.run !== undefined) {
+          try {
+            await step.run();
+          } catch (error) {
+            this.host.onRunError?.(error);
+          }
+        }
+        if (this.skipping) break;
         if (step.moveTo !== undefined) await this.host.moveTo(step.moveTo.x, step.moveTo.y);
         if (this.skipping) break;
         if (step.attachTo !== undefined) await this.host.attachTo(step.attachTo, step.attach);
@@ -46,7 +57,7 @@ export class StoryEngine {
         if (step.detach) await this.host.detach();
       }
       if (this.skipping) await this.host.detach();
-      this.host.onEnd?.();
+      this.host.onEnd?.(!this.skipping);
     } finally {
       this.running = false;
       this.paused = false;
