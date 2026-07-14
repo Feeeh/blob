@@ -75,6 +75,7 @@ const blob = createBlob({
   draggable: true,
   dismissible: true,
   respectReducedMotion: true,
+  reducedMotionNotice: "…",  // bubble line spoken when reduced motion is active; false to silence
   storageKey: 'blob',        // localStorage namespace (dismiss + "story already played")
   zIndex: 2147483000,        // layer above the page content
   story: [
@@ -155,7 +156,9 @@ and applies a goo pass (blur + alpha threshold) for the organic metaball look.
 ## 5. Accessibility & quality bars
 
 - `prefers-reduced-motion`: no bobbing/goo/travel animation — Blob repositions
-  instantly and still speaks. Overridable via `respectReducedMotion: false`.
+  instantly and still speaks. Overridable via `respectReducedMotion: false`. On
+  mount it warns the developer via `console.warn` and speaks a short notice to
+  the visitor (customize or silence with `reducedMotionNotice`).
 - Bubble text mirrored to a visually-hidden `aria-live="polite"` region.
 - Blob is a `button` (keyboard focusable); Enter/Space = click. Dismiss is honored
   across visits (localStorage).

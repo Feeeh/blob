@@ -105,6 +105,91 @@ function installDom(): {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
+describe('reduced-motion warning', () => {
+  const fakeRenderer = (): Renderer => ({ destroy: vi.fn(), mount: vi.fn(), render: vi.fn() });
+
+  it('warns the developer and speaks a notice when prefers-reduced-motion is active', async () => {
+    installDom();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const blob = createBlob({ renderer: fakeRenderer() });
+    const say = vi.fn();
+    blob.on('say', say);
+    await Promise.resolve();
+
+    expect(warn).toHaveBeenCalledOnce();
+    expect(String(warn.mock.calls[0]?.[0])).toContain('respectReducedMotion');
+    expect(say).toHaveBeenCalledWith(
+      "Animations are off to respect your reduced-motion setting, so I'll keep still.",
+    );
+    blob.destroy();
+  });
+
+  it('speaks a custom notice text', async () => {
+    installDom();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const blob = createBlob({ renderer: fakeRenderer(), reducedMotionNotice: 'Sem animações.' });
+    const say = vi.fn();
+    blob.on('say', say);
+    await Promise.resolve();
+
+    expect(say).toHaveBeenCalledWith('Sem animações.');
+    blob.destroy();
+  });
+
+  it('still warns the developer but stays quiet with reducedMotionNotice: false', async () => {
+    installDom();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const blob = createBlob({ renderer: fakeRenderer(), reducedMotionNotice: false });
+    const say = vi.fn();
+    blob.on('say', say);
+    await Promise.resolve();
+
+    expect(warn).toHaveBeenCalledOnce();
+    expect(say).not.toHaveBeenCalled();
+    blob.destroy();
+  });
+
+  it('does not speak the notice when the bubble is disabled', async () => {
+    installDom();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const blob = createBlob({ renderer: fakeRenderer(), bubble: false });
+    const say = vi.fn();
+    blob.on('say', say);
+    await Promise.resolve();
+
+    expect(warn).toHaveBeenCalledOnce();
+    expect(say).not.toHaveBeenCalled();
+    blob.destroy();
+  });
+
+  it('stays silent when the developer opted out with respectReducedMotion: false', async () => {
+    installDom();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const blob = createBlob({ renderer: fakeRenderer(), respectReducedMotion: false });
+    const say = vi.fn();
+    blob.on('say', say);
+    await Promise.resolve();
+
+    expect(warn).not.toHaveBeenCalled();
+    expect(say).not.toHaveBeenCalled();
+    blob.destroy();
+  });
+
+  it('stays silent when the developer chose physics: false', async () => {
+    installDom();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const blob = createBlob({ renderer: fakeRenderer(), physics: false });
+    const say = vi.fn();
+    blob.on('say', say);
+    await Promise.resolve();
+
+    expect(warn).not.toHaveBeenCalled();
+    expect(say).not.toHaveBeenCalled();
+    blob.destroy();
+  });
 });
 
 describe('createBlob movement controls', () => {
@@ -138,6 +223,7 @@ describe('createBlob movement controls', () => {
 
   it('moves, attaches, detaches on target loss, and cleans up in reduced motion', () => {
     const { target, runAnchorFrame, triggerScroll } = installDom();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
     const frames: SoftBodyState[] = [];
     const renderer: Renderer = {
       destroy: vi.fn(),

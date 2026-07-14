@@ -50,6 +50,8 @@ const DEFAULT_SIZE = 48;
 const DEFAULT_Z_INDEX = 2_147_483_000;
 const VIEWPORT_MARGIN = 16;
 const STYLE_ATTRIBUTE = 'data-blob-styles';
+const DEFAULT_REDUCED_MOTION_NOTICE =
+  "Animations are off to respect your reduced-motion setting, so I'll keep still.";
 
 type MotionKind = 'idle' | 'move' | 'rest' | 'attach' | 'circle';
 
@@ -79,7 +81,8 @@ export function createBlob(options: BlobOptions = {}): BlobController {
   const color = options.body?.color ?? options.color ?? DEFAULT_COLOR;
   const pointCount = positiveInteger(options.body?.points, DEFAULT_POINT_COUNT);
   const physics = options.physics === false ? {} : options.physics ?? {};
-  const reducedMotion = options.physics === false || shouldReduceMotion(options);
+  const mediaReducedMotion = options.physics !== false && shouldReduceMotion(options);
+  const reducedMotion = options.physics === false || mediaReducedMotion;
   const bubbleOptions = options.bubble === false ? null : options.bubble ?? {};
   installStyles();
 
@@ -579,6 +582,16 @@ export function createBlob(options: BlobOptions = {}): BlobController {
     throw error;
   }
   if (!destroyed && !dismissed && options.autoStart && !wasStoryPlayed(storageKey)) controller.start();
+  if (mediaReducedMotion) {
+    console.warn(
+      '[blob] prefers-reduced-motion is active: Blob will position instantly without animation. '
+        + 'Set respectReducedMotion: false to override.',
+    );
+    if (bubble !== null && !dismissed && options.reducedMotionNotice !== false) {
+      const notice = options.reducedMotionNotice ?? DEFAULT_REDUCED_MOTION_NOTICE;
+      queueMicrotask(() => { if (!destroyed && !dismissed) void controller.say(notice); });
+    }
+  }
   return controller;
 }
 

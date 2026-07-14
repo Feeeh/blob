@@ -147,6 +147,11 @@ export interface BlobOptions {
   dismissible?: boolean;
   /** Disable motion for visitors with prefers-reduced-motion. Default: true. */
   respectReducedMotion?: boolean;
+  /**
+   * Bubble notice spoken after mount when prefers-reduced-motion disables
+   * animation. Pass a string to localize it or `false` to stay quiet.
+   */
+  reducedMotionNotice?: string | false;
   /** localStorage namespace for dismiss + "story already played". Default: 'blob'. */
   storageKey?: string;
   /** Accessible names for Blob's built-in controls; override to localize. */
