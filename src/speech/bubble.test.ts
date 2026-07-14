@@ -117,7 +117,7 @@ describe('SpeechBubble', () => {
   it('automatically advances a line when configured', async () => {
     vi.useFakeTimers();
     const { elements, host } = installBubbleEnvironment();
-    const bubble = new SpeechBubble({ autoAdvance: 20, reducedMotion: true });
+    const bubble = new SpeechBubble({ autoAdvance: 20, characterDelay: 0, reducedMotion: true });
     bubble.mount(host);
     bubble.follow(rect(100, 100, 40, 40));
 
@@ -125,6 +125,24 @@ describe('SpeechBubble', () => {
     vi.advanceTimersByTime(20);
     await done;
 
+    expect(elements[0]?.hidden).toBe(true);
+  });
+
+  it('holds a reduced-motion line long enough to read, scaled by its length', async () => {
+    vi.useFakeTimers();
+    const { elements, host } = installBubbleEnvironment();
+    const bubble = new SpeechBubble({ autoAdvance: 20, characterDelay: 10, reducedMotion: true });
+    bubble.mount(host);
+    bubble.follow(rect(100, 100, 40, 40));
+
+    // 'next' is 4 code points → dwell = 4 * 10 + 20 = 60ms, not a flat 20ms.
+    const done = bubble.say('next');
+    vi.advanceTimersByTime(20);
+    await Promise.resolve();
+    expect(elements[0]?.hidden).toBe(false);
+
+    vi.advanceTimersByTime(40);
+    await done;
     expect(elements[0]?.hidden).toBe(true);
   });
 });

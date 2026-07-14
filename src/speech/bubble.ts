@@ -172,7 +172,9 @@ export class SpeechBubble {
   private scheduleAutoAdvance(speechId: number, text: string): void {
     const delay = this.options.autoAdvance;
     if (typeof delay !== 'number' || !Number.isFinite(delay) || delay < 0) return;
-    const typingDelay = this.options.reducedMotion ? 0 : nonNegative(this.options.characterDelay, 35);
+    // Reduced motion skips the typing animation, but the line must still stay up
+    // long enough to read — keep the per-character reading budget in the dwell.
+    const typingDelay = nonNegative(this.options.characterDelay, 35);
     this.autoAdvanceTimer = setTimeout(() => {
       this.autoAdvanceTimer = null;
       if (this.speechId !== speechId) return;
