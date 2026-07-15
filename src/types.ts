@@ -143,6 +143,8 @@ export interface BlobOptions {
   autoStart?: boolean;
   /** Allow dragging Blob around (springs back home). Default: true. */
   draggable?: boolean;
+  /** Randomly corrupt Blob's visuals with brief glitch bursts. Default: false. */
+  glitch?: boolean;
   /** Show a control to minimize/hide Blob, persisted per visitor. Default: true. */
   dismissible?: boolean;
   /** Disable motion for visitors with prefers-reduced-motion. Default: true. */

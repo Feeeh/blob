@@ -2,7 +2,24 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createBlob, defineBlobCharacter } from './index';
 import type { Renderer, SoftBodyState } from './types';
 
+class FakeClassList {
+  private readonly values = new Set<string>();
+
+  add(...tokens: string[]): void {
+    tokens.forEach((token) => this.values.add(token));
+  }
+
+  remove(...tokens: string[]): void {
+    tokens.forEach((token) => this.values.delete(token));
+  }
+
+  contains(token: string): boolean {
+    return this.values.has(token);
+  }
+}
+
 interface FakeElement {
+  classList: FakeClassList;
   className: string;
   hidden: boolean;
   isConnected: boolean;
@@ -23,6 +40,7 @@ interface FakeElement {
 
 function installDom(): {
   dragHandlers: Map<string, EventListener>;
+  elements: FakeElement[];
   target: FakeElement;
   runAnchorFrame: (time: number) => void;
   triggerScroll: () => void;
@@ -34,9 +52,11 @@ function installDom(): {
   let scrollListener: () => void = () => {
     throw new Error('Anchor did not register a scroll listener.');
   };
+  const elements: FakeElement[] = [];
   const createElement = (): FakeElement => ({
     addEventListener: vi.fn((event: string, listener: EventListener) => dragHandlers.set(event, listener)),
     append: vi.fn(),
+    classList: new FakeClassList(),
     className: '',
     getBoundingClientRect: vi.fn(() => ({
       bottom: 80,
@@ -69,7 +89,11 @@ function installDom(): {
   vi.stubGlobal('document', {
     addEventListener: vi.fn(),
     body,
-    createElement: vi.fn(() => createElement()),
+    createElement: vi.fn(() => {
+      const element = createElement();
+      elements.push(element);
+      return element;
+    }),
     createElementNS: vi.fn(() => createElement()),
     documentElement: { clientHeight: 600, clientWidth: 800 },
     head,
@@ -97,6 +121,7 @@ function installDom(): {
 
   return {
     dragHandlers,
+    elements,
     target,
     runAnchorFrame: (time) => frame(time),
     triggerScroll: () => scrollListener(),
@@ -104,6 +129,7 @@ function installDom(): {
 }
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -193,6 +219,21 @@ describe('reduced-motion warning', () => {
 });
 
 describe('createBlob movement controls', () => {
+  it('does not enable glitch under reduced motion', () => {
+    vi.useFakeTimers();
+    const { elements } = installDom();
+    const blob = createBlob({
+      bubble: false,
+      dismissible: false,
+      glitch: true,
+      renderer: { destroy: vi.fn(), mount: vi.fn(), render: vi.fn() },
+    });
+
+    vi.runAllTimers();
+    expect(elements[1]?.classList.contains('blob-glitch')).toBe(false);
+    blob.destroy();
+  });
+
   it('continues a story motion after a drag interrupt', async () => {
     const { dragHandlers, target } = installDom();
     const blob = createBlob({

@@ -140,6 +140,42 @@
   white-space: nowrap;
 }
 
+@keyframes blob-glitch-burst {
+  0% {
+    transform: translate(-3px, 1px) skewX(0.5deg);
+    filter: drop-shadow(2px 0 rgba(255, 0, 70, 0.5));
+  }
+
+  25% {
+    transform: translate(3px, -2px);
+    filter: drop-shadow(-2.5px 0 rgba(140, 60, 255, 0.5)) drop-shadow(0 2px rgba(255, 220, 0, 0.4));
+  }
+
+  40% {
+    transform: translate(0);
+    filter: none;
+  }
+
+  60% {
+    transform: translate(-1px, 3px) skewX(-0.4deg);
+    filter: drop-shadow(2px -1.5px rgba(255, 0, 70, 0.5)) drop-shadow(-2px 0 rgba(140, 60, 255, 0.45));
+  }
+
+  80% {
+    transform: translate(2px, -3px);
+    filter: drop-shadow(-2px 0 rgba(140, 60, 255, 0.5)) drop-shadow(0 2px rgba(255, 220, 0, 0.4));
+  }
+
+  100% {
+    transform: translate(-3px, 1px) skewX(0.5deg);
+    filter: drop-shadow(2px 0 rgba(255, 0, 70, 0.5));
+  }
+}
+
+.blob-visual.blob-glitch {
+  animation: blob-glitch-burst 160ms steps(1, end) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blob-layer * {
     transition: none !important;

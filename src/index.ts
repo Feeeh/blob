@@ -8,6 +8,7 @@ import { StoryEngine } from './core/story';
 import { PokeBehavior } from './interact/poke';
 import { DragBehavior } from './interact/drag';
 import { DismissBehavior } from './interact/dismiss';
+import { GlitchBehavior } from './interact/glitch';
 import { DEFAULT_POINT_COUNT, SoftBody } from './physics/softbody';
 import { createRenderer } from './renderers/renderer';
 import { SpeechBubble } from './speech/bubble';
@@ -491,6 +492,7 @@ export function createBlob(options: BlobOptions = {}): BlobController {
       releaseAnchor();
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      glitch.disable();
       poke.disable();
       drag.disable();
       dismiss.destroy();
@@ -508,6 +510,8 @@ export function createBlob(options: BlobOptions = {}): BlobController {
     on: (event, handler) => emitter.on(event, handler),
     off: (event, handler) => emitter.off(event, handler),
   };
+  const glitch = new GlitchBehavior();
+  if (options.glitch === true && !reducedMotion) glitch.enable(visualLayer);
   const poke = new PokeBehavior(() => {
     if (state.name !== 'idle') return;
     if (bubble?.isSpeaking) {
