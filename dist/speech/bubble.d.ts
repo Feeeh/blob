@@ -10,6 +10,8 @@ export interface SpeechBubbleOptions {
     tail?: boolean;
     autoAdvance?: number;
     ariaLabel?: string;
+    /** Extra class(es) kept on the bubble element for user CSS overrides. */
+    className?: string;
 }
 export declare class SpeechBubble {
     private readonly options;
@@ -21,6 +23,7 @@ export declare class SpeechBubble {
     private speechId;
     private measuredWidth;
     private measuredHeight;
+    private currentTextLength;
     private autoAdvanceTimer;
     constructor(options?: SpeechBubbleOptions);
     get isSpeaking(): boolean;
@@ -36,7 +39,11 @@ export declare class SpeechBubble {
     private readonly handleAdvance;
     private reposition;
     private measure;
-    private scheduleAutoAdvance;
+    /**
+     * The dwell starts only once the line has actually finished typing, so a
+     * slow device (late timers) can never auto-dismiss a half-typed phrase.
+     */
+    private readonly handleTypingComplete;
     private clearAutoAdvance;
     private get gap();
     private get margin();

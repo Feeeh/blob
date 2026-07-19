@@ -60,6 +60,19 @@ describe('Typewriter', () => {
     expect(updates.at(-1)).toBe('second');
   });
 
+  it('catches up when timers fire late, as on a busy older phone', () => {
+    vi.useFakeTimers();
+    const updates: string[] = [];
+    const typewriter = new Typewriter((text) => updates.push(text), { characterDelay: 10 });
+
+    void typewriter.play('hello');
+    // The main thread was blocked: wall time passed, the timer only fires now.
+    vi.setSystemTime(Date.now() + 500);
+    vi.advanceTimersByTime(10);
+
+    expect(updates.at(-1)).toBe('hello');
+  });
+
   it('keeps a surrogate-pair emoji together', () => {
     vi.useFakeTimers();
     const updates: string[] = [];

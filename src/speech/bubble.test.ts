@@ -128,6 +128,24 @@ describe('SpeechBubble', () => {
     expect(elements[0]?.hidden).toBe(true);
   });
 
+  it('starts the auto-advance dwell only after typing actually completes', async () => {
+    vi.useFakeTimers();
+    const { elements, host } = installBubbleEnvironment();
+    const bubble = new SpeechBubble({ autoAdvance: 30, characterDelay: 10 });
+    bubble.mount(host);
+    bubble.follow(rect(100, 100, 40, 40));
+
+    const done = bubble.say('hi');
+    vi.advanceTimersByTime(20);
+    await Promise.resolve();
+    expect(elements[1]?.textContent).toBe('hi');
+    expect(elements[0]?.hidden).toBe(false);
+
+    vi.advanceTimersByTime(30);
+    await done;
+    expect(elements[0]?.hidden).toBe(true);
+  });
+
   it('holds a reduced-motion line long enough to read, scaled by its length', async () => {
     vi.useFakeTimers();
     const { elements, host } = installBubbleEnvironment();

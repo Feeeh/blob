@@ -3,6 +3,8 @@ export type TypewriterState = 'idle' | 'typing' | 'waiting';
 export interface TypewriterOptions {
     characterDelay?: number;
     reducedMotion?: boolean;
+    /** Fired each time a line finishes typing and starts waiting for an advance. */
+    onTypingComplete?: () => void;
 }
 export declare class Typewriter {
     private readonly onUpdate;
@@ -13,6 +15,8 @@ export declare class Typewriter {
     private visibleCount;
     private timer;
     private resolveAdvance;
+    private typingStart;
+    private readonly onTypingComplete;
     constructor(onUpdate: (text: string) => void, options?: TypewriterOptions);
     get isActive(): boolean;
     /** Start a new line. The promise resolves only after the visitor advances it. */

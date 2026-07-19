@@ -408,10 +408,6 @@ export function createBlob(options: BlobOptions = {}): BlobController {
       if (destroyed) {
         return;
       }
-      if (options.renderer === 'css') {
-        controller.attachTo(target);
-        return;
-      }
       const element = Anchor.resolve(target);
       if (element === null) {
         emitter.emit('warn', 'Blob could not resolve a circle target.');
@@ -744,7 +740,11 @@ function applyTheme(host: HTMLElement, color: string, bubble: BlobBubbleOptions 
   setCssVariable(host, '--blob-bubble-border-width', bubble.borderWidth);
   setCssVariable(host, '--blob-bubble-padding', bubble.padding);
   setCssVariable(host, '--blob-bubble-font-size', bubble.fontSize);
-  setCssVariable(host, '--blob-bubble-max-width', bubble.maxWidth);
+  if (bubble.maxWidth !== undefined) {
+    // Clamp custom widths to the viewport so text never overflows small screens.
+    const width = typeof bubble.maxWidth === 'number' ? `${bubble.maxWidth}px` : bubble.maxWidth;
+    host.style.setProperty('--blob-bubble-max-width', `min(${width}, calc(100vw - 16px))`);
+  }
   setCssVariable(host, '--blob-bubble-tail-size', bubble.tailSize);
   if (bubble.fontFamily !== undefined) host.style.setProperty('--blob-font', bubble.fontFamily);
   if (bubble.lineHeight !== undefined) host.style.setProperty('--blob-bubble-line-height', String(bubble.lineHeight));
@@ -773,6 +773,7 @@ function speechOptions(bubble: BlobBubbleOptions, reducedMotion: boolean): {
   margin?: number;
   tail?: boolean;
   ariaLabel?: string;
+  className?: string;
 } {
   return {
     reducedMotion,
@@ -782,6 +783,7 @@ function speechOptions(bubble: BlobBubbleOptions, reducedMotion: boolean): {
     ...(bubble.margin === undefined ? {} : { margin: bubble.margin }),
     ...(bubble.tail === undefined ? {} : { tail: bubble.tail }),
     ...(bubble.ariaLabel === undefined ? {} : { ariaLabel: bubble.ariaLabel }),
+    ...(bubble.className === undefined ? {} : { className: bubble.className }),
   };
 }
 

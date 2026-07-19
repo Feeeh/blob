@@ -16,6 +16,8 @@ export interface SpeechBubbleOptions {
   tail?: boolean;
   autoAdvance?: number;
   ariaLabel?: string;
+  /** Extra class(es) kept on the bubble element for user CSS overrides. */
+  className?: string;
 }
 
 export class SpeechBubble {
@@ -27,6 +29,7 @@ export class SpeechBubble {
   private speechId = 0;
   private measuredWidth = 0;
   private measuredHeight = 0;
+  private currentTextLength = 0;
   private autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private readonly options: SpeechBubbleOptions = {}) {}
@@ -68,7 +71,7 @@ export class SpeechBubble {
           this.reposition();
         }
       },
-      this.options,
+      { ...this.options, onTypingComplete: this.handleTypingComplete },
     );
   }
 
@@ -82,8 +85,8 @@ export class SpeechBubble {
     this.element.hidden = false;
     this.liveRegion.textContent = text;
     this.clearAutoAdvance();
+    this.currentTextLength = Array.from(text).length;
     const speech = this.typewriter.play(text);
-    this.scheduleAutoAdvance(speechId, text);
     return speech.then(() => {
       if (this.speechId === speechId) {
         this.clearAutoAdvance();
@@ -152,6 +155,7 @@ export class SpeechBubble {
     const classes = ['blob-bubble'];
     if (shouldFlip) classes.push('blob-bubble--below');
     if (this.options.tail === false) classes.push('blob-bubble--no-tail');
+    if (this.options.className !== undefined) classes.push(this.options.className);
     this.element.className = classes.join(' ');
     this.element.style.left = `${Math.round(left)}px`;
     this.element.style.top = `${Math.round(Math.min(top, viewportHeight - height - this.margin))}px`;
@@ -169,19 +173,26 @@ export class SpeechBubble {
     }
   }
 
-  private scheduleAutoAdvance(speechId: number, text: string): void {
+  /**
+   * The dwell starts only once the line has actually finished typing, so a
+   * slow device (late timers) can never auto-dismiss a half-typed phrase.
+   */
+  private readonly handleTypingComplete = (): void => {
     const delay = this.options.autoAdvance;
     if (typeof delay !== 'number' || !Number.isFinite(delay) || delay < 0) return;
     // Reduced motion skips the typing animation, but the line must still stay up
     // long enough to read — keep the per-character reading budget in the dwell.
-    const typingDelay = nonNegative(this.options.characterDelay, 35);
+    const readingBudget = this.options.reducedMotion === true
+      ? this.currentTextLength * nonNegative(this.options.characterDelay, 35)
+      : 0;
+    const speechId = this.speechId;
+    this.clearAutoAdvance();
     this.autoAdvanceTimer = setTimeout(() => {
       this.autoAdvanceTimer = null;
       if (this.speechId !== speechId) return;
       this.typewriter?.advance();
-      this.typewriter?.advance();
-    }, Array.from(text).length * typingDelay + delay);
-  }
+    }, delay + readingBudget);
+  };
 
   private clearAutoAdvance(): void {
     if (this.autoAdvanceTimer !== null) {

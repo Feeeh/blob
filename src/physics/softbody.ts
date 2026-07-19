@@ -27,6 +27,7 @@ interface RingStyle {
   lineJoin: CanvasLineJoin;
   shape: BlobMorphShape;
   width: number;
+  radius: number;
 }
 
 export class SoftBody {
@@ -174,13 +175,8 @@ export class SoftBody {
     // Pad by half the stroke so the ring sits fully outside the target, not straddling its edge.
     const padding = nonNegativeFinite(morph.padding, this.radius * 0.4) + strokeWidth / 2;
     const shape = morph.shape ?? 'rounded';
-    const points = sampleOutline(
-      rect,
-      padding,
-      this.pointCount,
-      shape,
-      nonNegativeFinite(morph.radius, 24),
-    );
+    const cornerRadius = nonNegativeFinite(morph.radius, 24);
+    const points = sampleOutline(rect, padding, this.pointCount, shape, cornerRadius);
     this.setRestPositions(points, {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
@@ -194,6 +190,7 @@ export class SoftBody {
       lineJoin: morph.lineJoin ?? 'round',
       shape,
       width: strokeWidth,
+      radius: cornerRadius,
     };
     this.shape = 'ring';
   }
@@ -262,6 +259,7 @@ export class SoftBody {
       strokeLineJoin: this.ringStyle.lineJoin,
       strokeWidth: this.ringStyle.width,
       morphShape: this.ringStyle.shape,
+      morphRadius: this.ringStyle.radius,
     };
   }
 
@@ -334,6 +332,7 @@ function defaultRingStyle(radius: number, color: string): RingStyle {
     lineJoin: 'round',
     shape: 'rounded',
     width: Math.max(8, radius * 0.55),
+    radius: 24,
   };
 }
 

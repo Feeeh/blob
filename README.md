@@ -79,6 +79,8 @@ createBlob(guide);
 
 The same object works in JavaScript—omit `defineBlobCharacter` if you do not need TypeScript autocomplete. `physics: false` makes movement immediate and static; `bubble: false` makes `say()` and story speech continue without showing a bubble.
 
+Every bubble visual is an option: `background`, `color`, `borderColor`, `borderWidth`, `borderRadius`/`shape`, `padding`, `fontFamily`, `fontSize`, `lineHeight`, `maxWidth` (automatically clamped to the viewport), `shadow`, and `tail`. When the built-in knobs are not enough, pass `bubble: { className: 'my-bubble' }` and restyle the element entirely from your own stylesheet.
+
 For a one-off companion, pass the same object directly to `createBlob({ ... })`; the existing `data-blob-*` story attributes remain a no-script story option.
 
 ## Story Steps
@@ -94,7 +96,7 @@ Data-attribute steps append after `options.story`.
 
 ## Direct Controls And Renderers
 
-`attachTo()` and `circle()` accept the same per-call overrides as story steps, so a script can change targets, shape, radius, stroke color, and width at any time. Built-in renderers are `canvas2d`, `svg`, and `css`; CSS falls back from `circle()` to attachment.
+`attachTo()` and `circle()` accept the same per-call overrides as story steps, so a script can change targets, shape, radius, stroke color, and width at any time. Built-in renderers are `canvas2d`, `svg`, and `css`; all three support `circle()` — the CSS renderer draws the ring as a hollow bordered box.
 
 A custom renderer is the escape hatch for a fully bespoke character. It receives a `SoftBodyState` every frame, including perimeter points and morph stroke settings:
 

@@ -16,13 +16,13 @@ function wt(e, t, i, n = "nearest") {
   };
   let o = { x: t.x - s.x, y: t.y - s.y };
   if (o.x === 0 && o.y === 0) {
-    const h = [
+    const l = [
       { distance: t.x - e.left, direction: { x: -1, y: 0 }, point: { x: e.left, y: t.y } },
       { distance: e.right - t.x, direction: { x: 1, y: 0 }, point: { x: e.right, y: t.y } },
       { distance: t.y - e.top, direction: { x: 0, y: -1 }, point: { x: t.x, y: e.top } },
       { distance: e.bottom - t.y, direction: { x: 0, y: 1 }, point: { x: t.x, y: e.bottom } }
     ].reduce((c, u) => u.distance < c.distance ? u : c);
-    s.x = h.point.x, s.y = h.point.y, o = h.direction;
+    s.x = l.point.x, s.y = l.point.y, o = l.direction;
   }
   const r = Math.hypot(o.x, o.y);
   return {
@@ -193,7 +193,7 @@ class Rt {
     this.target?.removeEventListener("click", this.handleClick), this.target = null;
   }
 }
-class kt {
+class Ct {
   constructor(t, i, n) {
     this.onStart = t, this.onMove = i, this.onEnd = n;
   }
@@ -218,7 +218,7 @@ class kt {
     t.pointerId === this.pointerId && (this.target?.releasePointerCapture(t.pointerId), this.pointerId = null, this.onEnd());
   };
 }
-class Ct {
+class kt {
   constructor(t = "blob", i, n, s = "Restore Blob") {
     this.storageKey = t, this.onDismiss = i, this.onRestore = n, this.restoreLabel = s;
   }
@@ -281,7 +281,7 @@ class Nt {
     this.timers.add(s);
   }
 }
-const Ft = 0.1, It = 1e-3, Lt = 1e-3;
+const It = 0.1, Ft = 1e-3, Lt = 1e-3;
 class st {
   constructor(t = 0, i = 170, n = 2 * Math.sqrt(i)) {
     if (this.stiffness = i, this.damping = n, !Number.isFinite(this.stiffness) || this.stiffness <= 0)
@@ -296,21 +296,21 @@ class st {
   velocity = 0;
   target;
   update(t) {
-    const i = Number.isFinite(t) ? Math.min(Math.max(t, 0), Ft) : 0;
+    const i = Number.isFinite(t) ? Math.min(Math.max(t, 0), It) : 0;
     if (i === 0 || this.value === this.target && this.velocity === 0)
       return;
     const n = this.value - this.target, s = Math.sqrt(this.stiffness), o = Math.max(this.damping, 0) / (2 * s);
     if (o < 1 - Number.EPSILON) {
-      const r = s * Math.sqrt(1 - o ** 2), a = Math.exp(-o * s * i), h = Math.cos(r * i), c = Math.sin(r * i), u = (this.velocity + o * s * n) / r;
-      this.value = this.target + a * (n * h + u * c), this.velocity = a * (this.velocity * h - (s ** 2 * n + o * s * this.velocity) / r * c);
+      const r = s * Math.sqrt(1 - o ** 2), a = Math.exp(-o * s * i), l = Math.cos(r * i), c = Math.sin(r * i), u = (this.velocity + o * s * n) / r;
+      this.value = this.target + a * (n * l + u * c), this.velocity = a * (this.velocity * l - (s ** 2 * n + o * s * this.velocity) / r * c);
     } else if (o <= 1 + Number.EPSILON) {
       const r = Math.exp(-s * i), a = this.velocity + s * n;
       this.value = this.target + (n + a * i) * r, this.velocity = (this.velocity - s * a * i) * r;
     } else {
-      const r = Math.sqrt(o ** 2 - 1), a = -s * (o - r), h = -s * (o + r), c = (this.velocity - h * n) / (a - h), u = n - c, m = c * Math.exp(a * i), f = u * Math.exp(h * i);
-      this.value = this.target + m + f, this.velocity = a * m + h * f;
+      const r = Math.sqrt(o ** 2 - 1), a = -s * (o - r), l = -s * (o + r), c = (this.velocity - l * n) / (a - l), u = n - c, m = c * Math.exp(a * i), b = u * Math.exp(l * i);
+      this.value = this.target + m + b, this.velocity = a * m + l * b;
     }
-    Math.abs(this.target - this.value) < It && Math.abs(this.velocity) < Lt && this.snap(this.target);
+    Math.abs(this.target - this.value) < Ft && Math.abs(this.velocity) < Lt && this.snap(this.target);
   }
   get isAtRest() {
     return this.value === this.target && this.velocity === 0;
@@ -320,8 +320,8 @@ class st {
     this.value = t, this.target = t, this.velocity = 0;
   }
 }
-const mt = 48, Dt = 6, Ot = 1.8, rt = 2.4, ot = 0.06, Bt = 320, Pt = 0.1;
-class zt {
+const mt = 48, Dt = 6, Ot = 1.8, rt = 2.4, ot = 0.06, Bt = 320, Wt = 0.1;
+class Pt {
   constructor(t = mt, i = 48, n = "#8b5cf6", s = !1, o = {}) {
     if (this.radius = i, this.color = n, this.reducedMotion = s, this.physics = o, !Number.isInteger(t) || t < 3)
       throw new RangeError("SoftBody requires at least three perimeter points.");
@@ -330,7 +330,7 @@ class zt {
     this.pointCount = t, this.centerX = U(o), this.centerY = U(o), this.points = Array.from({ length: t }, () => ({
       x: U(o),
       y: U(o)
-    })), this.ringStyle = Wt(i, n);
+    })), this.ringStyle = zt(i, n);
   }
   radius;
   color;
@@ -379,8 +379,8 @@ class zt {
       const o = s.x.value - this.centerX.value, r = s.y.value - this.centerY.value, a = Math.hypot(o, r);
       if (a === 0)
         continue;
-      const h = (o * n.x + r * n.y) / a, c = B(this.physics.landingSquish, 260);
-      s.x.velocity -= n.x * h * c, s.y.velocity -= n.y * h * c;
+      const l = (o * n.x + r * n.y) / a, c = B(this.physics.landingSquish, 260);
+      s.x.velocity -= n.x * l * c, s.y.velocity -= n.y * l * c;
     }
   }
   /** Set arbitrary perimeter rest positions for later attachment and ring behaviors. */
@@ -400,24 +400,19 @@ class zt {
   }
   /** Expand the perimeter into a rounded rectangle around a target element. */
   setRingAround(t, i = {}) {
-    const n = typeof i == "number" ? { padding: i } : i, s = B(n.strokeWidth, Math.max(8, this.radius * 0.55)), o = B(n.padding, this.radius * 0.4) + s / 2, r = n.shape ?? "rounded", a = Qt(
-      t,
-      o,
-      this.pointCount,
-      r,
-      B(n.radius, 24)
-    );
-    this.setRestPositions(a, {
+    const n = typeof i == "number" ? { padding: i } : i, s = B(n.strokeWidth, Math.max(8, this.radius * 0.55)), o = B(n.padding, this.radius * 0.4) + s / 2, r = n.shape ?? "rounded", a = B(n.radius, 24), l = Qt(t, o, this.pointCount, r, a);
+    this.setRestPositions(l, {
       x: t.left + t.width / 2,
       y: t.top + t.height / 2
     });
-    const h = Math.min(t.width, t.height) + o * 2;
-    this.wobbleScale = Math.min(1, Math.sqrt(h / Bt)), this.ringStyle = {
+    const c = Math.min(t.width, t.height) + o * 2;
+    this.wobbleScale = Math.min(1, Math.sqrt(c / Bt)), this.ringStyle = {
       color: n.strokeColor ?? this.color,
       lineCap: n.lineCap ?? "round",
       lineJoin: n.lineJoin ?? "round",
       shape: r,
-      width: s
+      width: s,
+      radius: a
     }, this.shape = "ring";
   }
   poke() {
@@ -429,9 +424,9 @@ class zt {
   }
   update(t) {
     this.initialized || this.setIdleAt({ x: 0, y: 0 });
-    const i = Number.isFinite(t) ? Math.min(Math.max(t, 0), Pt) : 0;
+    const i = Number.isFinite(t) ? Math.min(Math.max(t, 0), Wt) : 0;
     this.reducedMotion ? (this.centerX.snap(this.centerX.target), this.centerY.snap(this.centerY.target)) : (this.elapsedSeconds += i, this.centerX.update(i), this.centerY.update(i));
-    const n = this.mode === "idle", s = n || this.mode === "moving", o = this.reducedMotion || !n ? 0 : Math.sin(this.elapsedSeconds * I(this.physics.bobFrequency, Ot)) * I(this.physics.bobAmplitude, Dt);
+    const n = this.mode === "idle", s = n || this.mode === "moving", o = this.reducedMotion || !n ? 0 : Math.sin(this.elapsedSeconds * F(this.physics.bobFrequency, Ot)) * F(this.physics.bobAmplitude, Dt);
     if (s ? this.setPointTargets(
       this.centerX.value,
       this.centerY.value + o,
@@ -450,20 +445,21 @@ class zt {
       strokeLineCap: this.ringStyle.lineCap,
       strokeLineJoin: this.ringStyle.lineJoin,
       strokeWidth: this.ringStyle.width,
-      morphShape: this.ringStyle.shape
+      morphShape: this.ringStyle.shape,
+      morphRadius: this.ringStyle.radius
     };
   }
   /** Keep a morphed body alive: ripple each point radially around its rest slot. */
   wobbleCustomRest() {
-    const t = this.customRest, i = I(this.physics.breatheFrequency, rt), n = this.radius * I(this.physics.breatheAmplitude, ot) * this.wobbleScale, s = this.centerX.target, o = this.centerY.target;
+    const t = this.customRest, i = F(this.physics.breatheFrequency, rt), n = this.radius * F(this.physics.breatheAmplitude, ot) * this.wobbleScale, s = this.centerX.target, o = this.centerY.target;
     for (let r = 0; r < this.pointCount; r += 1) {
-      const a = t[r], h = a.x - s, c = a.y - o, u = Math.hypot(h, c) || 1, m = Math.sin(this.elapsedSeconds * i + r * 1.7) * n, f = this.points[r];
-      f.x.target = a.x + h / u * m, f.y.target = a.y + c / u * m;
+      const a = t[r], l = a.x - s, c = a.y - o, u = Math.hypot(l, c) || 1, m = Math.sin(this.elapsedSeconds * i + r * 1.7) * n, b = this.points[r];
+      b.x.target = a.x + l / u * m, b.y.target = a.y + c / u * m;
     }
   }
   setPointTargets(t, i, n, s, o = !1) {
     for (let r = 0; r < this.pointCount; r += 1) {
-      const a = r / this.pointCount * Math.PI * 2, h = !o || this.reducedMotion ? 0 : Math.sin(n * I(this.physics.breatheFrequency, rt) + r * 1.7) * this.radius * I(this.physics.breatheAmplitude, ot), c = t + Math.cos(a) * (this.radius + h), u = i + Math.sin(a) * (this.radius + h), m = this.points[r];
+      const a = r / this.pointCount * Math.PI * 2, l = !o || this.reducedMotion ? 0 : Math.sin(n * F(this.physics.breatheFrequency, rt) + r * 1.7) * this.radius * F(this.physics.breatheAmplitude, ot), c = t + Math.cos(a) * (this.radius + l), u = i + Math.sin(a) * (this.radius + l), m = this.points[r];
       s ? (m.x.snap(c), m.y.snap(u)) : (m.x.target = c, m.y.target = u);
     }
   }
@@ -476,13 +472,14 @@ function U(e) {
   const t = Jt(e.stiffness, 170);
   return e.damping === void 0 ? new st(0, t) : new st(0, t, e.damping);
 }
-function Wt(e, t) {
+function zt(e, t) {
   return {
     color: t,
     lineCap: "round",
     lineJoin: "round",
     shape: "rounded",
-    width: Math.max(8, e * 0.55)
+    width: Math.max(8, e * 0.55),
+    radius: 24
   };
 }
 function Qt(e, t, i, n, s) {
@@ -490,7 +487,7 @@ function Qt(e, t, i, n, s) {
 }
 function qt(e, t, i, n) {
   const s = { x: e.left + e.width / 2, y: e.top + e.height / 2 }, o = Math.max(e.width, e.height) / 2 + t, r = o || e.width / 2 + t, a = o || e.height / 2 + t;
-  return Array.from({ length: i }, (h, c) => {
+  return Array.from({ length: i }, (l, c) => {
     const u = c / i * Math.PI * 2 - Math.PI / 2;
     return { x: s.x + Math.cos(u) * r, y: s.y + Math.sin(u) * a };
   });
@@ -506,7 +503,7 @@ function Ut(e, t) {
     width: i
   };
 }
-function I(e, t) {
+function F(e, t) {
   return typeof e == "number" && Number.isFinite(e) ? e : t;
 }
 function Jt(e, t) {
@@ -518,28 +515,28 @@ function B(e, t) {
 function at(e, t, i, n = 24) {
   if (!Number.isInteger(i) || i < 3)
     throw new RangeError("Rounded rectangle sampling requires at least three points.");
-  const s = e.left - t, o = e.top - t, r = e.width + t * 2, a = e.height + t * 2, h = Math.min(Math.max(n, 0), r / 2, a / 2);
+  const s = e.left - t, o = e.top - t, r = e.width + t * 2, a = e.height + t * 2, l = Math.min(Math.max(n, 0), r / 2, a / 2);
   if (r === 0 || a === 0)
-    return Array.from({ length: i }, (R, y) => ({
+    return Array.from({ length: i }, (T, y) => ({
       x: s + r * y / Math.max(1, i - 1),
       y: o + a * y / Math.max(1, i - 1)
     }));
-  const c = Math.max(0, r - h * 2), u = Math.max(0, a - h * 2), m = Math.PI * h / 2, f = (c + u) * 2 + m * 4;
-  return Array.from({ length: i }, (R, y) => Gt(
+  const c = Math.max(0, r - l * 2), u = Math.max(0, a - l * 2), m = Math.PI * l / 2, b = (c + u) * 2 + m * 4;
+  return Array.from({ length: i }, (T, y) => Gt(
     s,
     o,
     r,
     a,
-    h,
+    l,
     c,
     u,
     m,
-    f * y / i
+    b * y / i
   ));
 }
-function Gt(e, t, i, n, s, o, r, a, h) {
+function Gt(e, t, i, n, s, o, r, a, l) {
   const c = [o, a, r, a, o, a, r, a];
-  let u = h, m = 0;
+  let u = l, m = 0;
   for (; u > c[m] && m < c.length - 1; )
     u -= c[m], m += 1;
   return m === 0 ? { x: e + s + u, y: t } : m === 1 ? J(e + i - s, t + s, s, -Math.PI / 2 + u / s) : m === 2 ? { x: e + i, y: t + s + u } : m === 3 ? J(e + i - s, t + n - s, s, u / s) : m === 4 ? { x: e + i - s - u, y: t + n } : m === 5 ? J(e + s, t + n - s, s, Math.PI / 2 + u / s) : m === 6 ? { x: e, y: t + n - s - u } : J(e + s, t + s, s, Math.PI + u / s);
@@ -603,20 +600,20 @@ class Kt {
     const n = i.length, s = i[0];
     t.beginPath(), t.moveTo(s.x, s.y);
     for (let o = 0; o < n; o += 1) {
-      const r = i[(o - 1 + n) % n], a = i[o], h = i[(o + 1) % n], c = i[(o + 2) % n], u = {
-        x: a.x + (h.x - r.x) / 6,
-        y: a.y + (h.y - r.y) / 6
+      const r = i[(o - 1 + n) % n], a = i[o], l = i[(o + 1) % n], c = i[(o + 2) % n], u = {
+        x: a.x + (l.x - r.x) / 6,
+        y: a.y + (l.y - r.y) / 6
       }, m = {
-        x: h.x - (c.x - a.x) / 6,
-        y: h.y - (c.y - a.y) / 6
+        x: l.x - (c.x - a.x) / 6,
+        y: l.y - (c.y - a.y) / 6
       };
       t.bezierCurveTo(
         u.x,
         u.y,
         m.x,
         m.y,
-        h.x,
-        h.y
+        l.x,
+        l.y
       );
     }
     t.closePath();
@@ -631,6 +628,20 @@ class Yt {
   }
   render(t) {
     if (this.element === null) return;
+    if (t.shape === "ring" && t.points.length > 0) {
+      const n = t.points.map((l) => l.x), s = t.points.map((l) => l.y), o = Math.min(...n), r = Math.min(...s), a = t.strokeWidth;
+      Object.assign(this.element.style, {
+        left: `${o - a / 2}px`,
+        top: `${r - a / 2}px`,
+        width: `${Math.max(...n) - o + a}px`,
+        height: `${Math.max(...s) - r + a}px`,
+        boxSizing: "border-box",
+        background: "transparent",
+        border: `${a}px solid ${t.strokeColor ?? t.color}`,
+        borderRadius: t.morphShape === "circle" ? "50%" : t.morphShape === "rounded" ? `${t.morphRadius ?? 24}px` : "0"
+      });
+      return;
+    }
     const i = Math.max(...t.points.map((n) => Math.hypot(n.x - t.center.x, n.y - t.center.y)), 1);
     Object.assign(this.element.style, {
       left: `${t.center.x - i}px`,
@@ -638,7 +649,8 @@ class Yt {
       width: `${i * 2}px`,
       height: `${i * 2}px`,
       background: t.color,
-      borderRadius: t.shape === "ring" ? "35%" : "50%"
+      border: "0",
+      borderRadius: "50%"
     });
   }
   destroy() {
@@ -685,7 +697,7 @@ function Xt(e, t = !1) {
 }
 class jt {
   constructor(t, i = {}) {
-    this.onUpdate = t, this.characterDelay = Vt(i.characterDelay, 35), this.reducedMotion = i.reducedMotion ?? !1;
+    this.onUpdate = t, this.characterDelay = Vt(i.characterDelay, 35), this.reducedMotion = i.reducedMotion ?? !1, this.onTypingComplete = i.onTypingComplete;
   }
   onUpdate;
   characterDelay;
@@ -695,6 +707,8 @@ class jt {
   visibleCount = 0;
   timer = null;
   resolveAdvance = null;
+  typingStart = 0;
+  onTypingComplete;
   get isActive() {
     return this.state !== "idle";
   }
@@ -705,7 +719,7 @@ class jt {
         this.finishTyping();
         return;
       }
-      this.state = "typing", this.scheduleNextCharacter();
+      this.state = "typing", this.typingStart = Date.now(), this.scheduleNextCharacter();
     });
   }
   /** First advance finishes typing; the next advance resolves the current line. */
@@ -721,7 +735,12 @@ class jt {
   }
   scheduleNextCharacter() {
     this.timer = setTimeout(() => {
-      if (this.timer = null, this.visibleCount += 1, this.onUpdate(this.characters.slice(0, this.visibleCount).join("")), this.visibleCount >= this.characters.length) {
+      this.timer = null;
+      const t = Date.now() - this.typingStart, i = this.characterDelay > 0 ? Math.floor(t / this.characterDelay) : this.characters.length;
+      if (this.visibleCount = Math.min(
+        this.characters.length,
+        Math.max(this.visibleCount + 1, i)
+      ), this.onUpdate(this.characters.slice(0, this.visibleCount).join("")), this.visibleCount >= this.characters.length) {
         this.finishTyping();
         return;
       }
@@ -729,7 +748,7 @@ class jt {
     }, this.characterDelay);
   }
   finishTyping() {
-    this.clearTimer(), this.visibleCount = this.characters.length, this.onUpdate(this.characters.join("")), this.state = "waiting";
+    this.clearTimer(), this.visibleCount = this.characters.length, this.onUpdate(this.characters.join("")), this.state = "waiting", this.onTypingComplete?.();
   }
   finish() {
     this.clearTimer(), this.state = "idle";
@@ -757,6 +776,7 @@ class te {
   speechId = 0;
   measuredWidth = 0;
   measuredHeight = 0;
+  currentTextLength = 0;
   autoAdvanceTimer = null;
   get isSpeaking() {
     return this.typewriter?.isActive ?? !1;
@@ -772,16 +792,14 @@ class te {
       (o) => {
         this.textElement !== null && (this.textElement.textContent = o, this.measure(), this.reposition());
       },
-      this.options
+      { ...this.options, onTypingComplete: this.handleTypingComplete }
     );
   }
   say(t) {
     if (this.element === null || this.liveRegion === null || this.typewriter === null)
       throw new Error("SpeechBubble must be mounted before it can speak.");
     const i = this.speechId + 1;
-    this.speechId = i, this.element.hidden = !1, this.liveRegion.textContent = t, this.clearAutoAdvance();
-    const n = this.typewriter.play(t);
-    return this.scheduleAutoAdvance(i, t), n.then(() => {
+    return this.speechId = i, this.element.hidden = !1, this.liveRegion.textContent = t, this.clearAutoAdvance(), this.currentTextLength = Array.from(t).length, this.typewriter.play(t).then(() => {
       this.speechId === i && (this.clearAutoAdvance(), this.hide());
     });
   }
@@ -807,8 +825,8 @@ class te {
     const t = this.measuredWidth, i = this.measuredHeight, n = document.documentElement.clientWidth || window.innerWidth, s = document.documentElement.clientHeight || window.innerHeight, o = this.anchor.left + this.anchor.width / 2 - t / 2, r = Math.min(
       Math.max(o, this.margin),
       Math.max(this.margin, n - t - this.margin)
-    ), a = this.anchor.top - i - this.gap < this.margin, h = a ? this.anchor.bottom + this.gap : this.anchor.top - i - this.gap, c = ["blob-bubble"];
-    a && c.push("blob-bubble--below"), this.options.tail === !1 && c.push("blob-bubble--no-tail"), this.element.className = c.join(" "), this.element.style.left = `${Math.round(r)}px`, this.element.style.top = `${Math.round(Math.min(h, s - i - this.margin))}px`;
+    ), a = this.anchor.top - i - this.gap < this.margin, l = a ? this.anchor.bottom + this.gap : this.anchor.top - i - this.gap, c = ["blob-bubble"];
+    a && c.push("blob-bubble--below"), this.options.tail === !1 && c.push("blob-bubble--no-tail"), this.options.className !== void 0 && c.push(this.options.className), this.element.className = c.join(" "), this.element.style.left = `${Math.round(r)}px`, this.element.style.top = `${Math.round(Math.min(l, s - i - this.margin))}px`;
     const u = Math.min(
       Math.max(this.anchor.left + this.anchor.width / 2 - r - 8, 4),
       Math.max(4, t - 20)
@@ -818,14 +836,18 @@ class te {
   measure() {
     this.element !== null && (this.measuredWidth = this.element.offsetWidth, this.measuredHeight = this.element.offsetHeight);
   }
-  scheduleAutoAdvance(t, i) {
-    const n = this.options.autoAdvance;
-    if (typeof n != "number" || !Number.isFinite(n) || n < 0) return;
-    const s = X(this.options.characterDelay, 35);
-    this.autoAdvanceTimer = setTimeout(() => {
-      this.autoAdvanceTimer = null, this.speechId === t && (this.typewriter?.advance(), this.typewriter?.advance());
-    }, Array.from(i).length * s + n);
-  }
+  /**
+   * The dwell starts only once the line has actually finished typing, so a
+   * slow device (late timers) can never auto-dismiss a half-typed phrase.
+   */
+  handleTypingComplete = () => {
+    const t = this.options.autoAdvance;
+    if (typeof t != "number" || !Number.isFinite(t) || t < 0) return;
+    const i = this.options.reducedMotion === !0 ? this.currentTextLength * X(this.options.characterDelay, 35) : 0, n = this.speechId;
+    this.clearAutoAdvance(), this.autoAdvanceTimer = setTimeout(() => {
+      this.autoAdvanceTimer = null, this.speechId === n && this.typewriter?.advance();
+    }, t + i);
+  };
   clearAutoAdvance() {
     this.autoAdvanceTimer !== null && (clearTimeout(this.autoAdvanceTimer), this.autoAdvanceTimer = null);
   }
@@ -847,22 +869,22 @@ function Ee(e = {}) {
   if (typeof document > "u" || document.body === null)
     throw new Error("createBlob() must be called after document.body is available.");
   const t = ae(e.body?.size ?? e.size, ne), i = e.body?.color ?? e.color ?? ie, n = le(e.body?.points, mt), s = e.physics === !1 ? {} : e.physics ?? {}, o = e.physics !== !1 && oe(e), r = e.physics === !1 || o, a = e.bubble === !1 ? null : e.bubble ?? {};
-  fe();
-  const h = document.createElement("div");
-  h.className = "blob-layer", Object.assign(h.style, {
+  be();
+  const l = document.createElement("div");
+  l.className = "blob-layer", Object.assign(l.style, {
     position: "fixed",
     inset: "0",
     pointerEvents: "none",
     zIndex: String(ce(e.zIndex, se))
-  }), pe(h, i, a);
+  }), fe(l, i, a);
   const c = document.createElement("div");
-  c.className = "blob-visual", h.append(c);
+  c.className = "blob-visual", l.append(c);
   const u = document.createElement("button");
   u.type = "button", u.className = "blob-hit-target", u.setAttribute("aria-label", e.labels?.guide ?? "Blob, your guide"), c.append(u);
   const m = document.createElement("button");
   m.type = "button", m.className = "blob-dismiss-button", m.setAttribute("aria-label", e.labels?.dismiss ?? "Dismiss Blob"), m.append(ue()), c.append(m);
-  const f = new zt(n, t, i, r, s), R = Xt(e.renderer ?? "canvas2d", r), y = a === null ? null : new te(ye(a, r)), p = new Et(), g = new St();
-  let w = !1, k = null, G = performance.now(), x = null, K = null, D = null, P = null, N = !1, Y = null, z = { x: 0, y: 0 }, d = {
+  const b = new Pt(n, t, i, r, s), T = Xt(e.renderer ?? "canvas2d", r), y = a === null ? null : new te(ye(a, r)), f = new Et(), g = new St();
+  let w = !1, C = null, G = performance.now(), x = null, K = null, D = null, W = null, N = !1, Y = null, P = { x: 0, y: 0 }, d = {
     kind: "idle",
     target: null,
     direction: { x: 0, y: 0 },
@@ -870,41 +892,41 @@ function Ee(e = {}) {
     attachedElement: null,
     attachEmitted: !1
   };
-  const pt = () => ({
-    x: bt() - t - ht,
-    y: ft() - t - ht
+  const ft = () => ({
+    x: pt() - t - ht,
+    y: bt() - t - ht
   }), j = () => {
     g.name !== "moving" && g.canTransition("moving") && g.transition("moving");
-  }, H = (l, b) => {
-    const E = d.target === null || we(d.target, b) > 0.5;
-    d.kind = l, d.attachedElement = l === "attach" || l === "circle" ? d.attachedElement : null, E && (d.target = b, d.direction = { x: b.x - z.x, y: b.y - z.y }, !((l === "attach" || l === "circle") && d.attachEmitted) && (d.landed = !1, j()));
-  }, F = () => {
+  }, H = (h, p) => {
+    const E = d.target === null || we(d.target, p) > 0.5;
+    d.kind = h, d.attachedElement = h === "attach" || h === "circle" ? d.attachedElement : null, E && (d.target = p, d.direction = { x: p.x - P.x, y: p.y - P.y }, !((h === "attach" || h === "circle") && d.attachEmitted) && (d.landed = !1, j()));
+  }, I = () => {
     x?.stop(), x = null;
-  }, C = () => {
-    const l = K;
-    K = null, l?.();
-  }, W = () => d.landed || d.kind === "idle" && f.isCenterAtRest ? Promise.resolve() : new Promise((l) => {
-    K = l;
+  }, k = () => {
+    const h = K;
+    K = null, h?.();
+  }, z = () => d.landed || d.kind === "idle" && b.isCenterAtRest ? Promise.resolve() : new Promise((h) => {
+    K = h;
   }), gt = () => {
-    if (!(d.landed || d.target === null || !f.isCenterAtRest)) {
-      if (d.landed = !0, f.squishTowards(d.direction), d.kind === "attach") {
-        g.canTransition("attached") && g.transition("attached"), d.attachedElement !== null && !d.attachEmitted && (d.attachEmitted = !0, p.emit("attach", d.attachedElement)), C();
+    if (!(d.landed || d.target === null || !b.isCenterAtRest)) {
+      if (d.landed = !0, b.squishTowards(d.direction), d.kind === "attach") {
+        g.canTransition("attached") && g.transition("attached"), d.attachedElement !== null && !d.attachEmitted && (d.attachEmitted = !0, f.emit("attach", d.attachedElement)), k();
         return;
       }
       if (d.kind === "circle") {
-        g.canTransition("circling") && g.transition("circling"), d.attachedElement !== null && !d.attachEmitted && (d.attachEmitted = !0, p.emit("circle", d.attachedElement)), C();
+        g.canTransition("circling") && g.transition("circling"), d.attachedElement !== null && !d.attachEmitted && (d.attachEmitted = !0, f.emit("circle", d.attachedElement)), k();
         return;
       }
-      d.kind === "move" && (d.kind = "rest", g.canTransition("idle") && g.transition("idle"), C());
+      d.kind === "move" && (d.kind = "rest", g.canTransition("idle") && g.transition("idle"), k());
     }
-  }, A = (l) => {
-    P !== null ? f.setMovingAt(P) : d.kind === "idle" ? f.setIdleAt(pt()) : d.kind === "rest" && d.target !== null ? f.setIdleAt(d.target) : d.kind !== "circle" && d.target !== null && f.setMovingAt(d.target);
-    const b = f.update(l);
-    z = b.center, R.render(b);
-    const E = be(b, t);
+  }, A = (h) => {
+    W !== null ? b.setMovingAt(W) : d.kind === "idle" ? b.setIdleAt(ft()) : d.kind === "rest" && d.target !== null ? b.setIdleAt(d.target) : d.kind !== "circle" && d.target !== null && b.setMovingAt(d.target);
+    const p = b.update(h);
+    P = p.center, T.render(p);
+    const E = pe(p, t);
     y?.follow(E), Object.assign(u.style, {
-      left: `${Math.round(b.center.x - t)}px`,
-      top: `${Math.round(b.center.y - t)}px`,
+      left: `${Math.round(p.center.x - t)}px`,
+      top: `${Math.round(p.center.y - t)}px`,
       width: `${t * 2}px`,
       height: `${t * 2}px`
     }), e.dismissible !== !1 && me(
@@ -912,54 +934,54 @@ function Ee(e = {}) {
       E,
       y?.visibleRect ?? null,
       d.kind === "idle" || d.kind === "rest"
-    ), d.kind === "idle" && g.name === "moving" && f.isCenterAtRest ? (g.transition("idle"), d.landed = !0, C()) : d.kind !== "rest" && gt();
+    ), d.kind === "idle" && g.name === "moving" && b.isCenterAtRest ? (g.transition("idle"), d.landed = !0, k()) : d.kind !== "rest" && gt();
   }, Z = () => {
-    !w && !r && document.visibilityState !== "hidden" && (k = window.requestAnimationFrame(yt));
-  }, yt = (l) => {
-    k = null, !(w || document.visibilityState === "hidden") && (A((l - G) / 1e3), G = l, Z());
+    !w && !r && document.visibilityState !== "hidden" && (C = window.requestAnimationFrame(yt));
+  }, yt = (h) => {
+    C = null, !(w || document.visibilityState === "hidden") && (A((h - G) / 1e3), G = h, Z());
   }, V = () => {
     if (document.visibilityState === "hidden") {
-      k !== null && (window.cancelAnimationFrame(k), k = null);
+      C !== null && (window.cancelAnimationFrame(C), C = null);
       return;
     }
     G = performance.now(), A(0), Z();
   }, $ = () => {
-    de(R) && R.resize(), A(0);
+    de(T) && T.resize(), A(0);
   };
-  document.body.append(h);
+  document.body.append(l);
   try {
-    R.mount(c), y?.mount(c), A(0);
-  } catch (l) {
-    throw y?.destroy(), R.destroy(), h.remove(), l;
+    T.mount(c), y?.mount(c), A(0);
+  } catch (h) {
+    throw y?.destroy(), T.destroy(), l.remove(), h;
   }
   window.addEventListener("resize", $), document.addEventListener("visibilitychange", V), Z();
   const v = {
     start: () => {
-      w || (p.emit("start", void 0), D?.play());
+      w || (f.emit("start", void 0), D?.play());
     },
     pause: () => D?.pause(),
     skip: () => D?.skip(),
-    say: (l) => w ? Promise.resolve() : (p.emit("say", l), y?.say(l) ?? Promise.resolve()),
-    moveTo: (l) => {
-      w || !ve(l) || (F(), d = {
+    say: (h) => w ? Promise.resolve() : (f.emit("say", h), y?.say(h) ?? Promise.resolve()),
+    moveTo: (h) => {
+      w || !ve(h) || (I(), d = {
         kind: "move",
         target: null,
         direction: { x: 0, y: 0 },
         landed: !1,
         attachedElement: null,
         attachEmitted: !1
-      }, H("move", l), A(0));
+      }, H("move", h), A(0));
     },
-    attachTo: (l, b = {}) => {
+    attachTo: (h, p = {}) => {
       if (w)
         return;
-      const E = q.resolve(l);
+      const E = q.resolve(h);
       if (E === null) {
-        p.emit("warn", "Blob could not resolve an attachment target."), C();
+        f.emit("warn", "Blob could not resolve an attachment target."), k();
         return;
       }
-      F();
-      const Q = { ...e.attachment, ...b };
+      I();
+      const Q = { ...e.attachment, ...p };
       d = {
         kind: "attach",
         target: null,
@@ -972,37 +994,33 @@ function Ee(e = {}) {
         onRect: (S) => {
           if (x === M) {
             if (S.width === 0 || S.height === 0) {
-              x = null, M.stop(), p.emit("warn", "Blob detached because its attachment target is no longer visible."), v.detach();
+              x = null, M.stop(), f.emit("warn", "Blob detached because its attachment target is no longer visible."), v.detach();
               return;
             }
             H("attach", wt(
               S,
-              z,
+              P,
               t + he(Q.gap, 0),
               Q.side
             )), r && A(0);
           }
         },
         onLost: () => {
-          x === M && (x = null, p.emit("warn", "Blob detached because its attachment target is no longer available."), v.detach());
+          x === M && (x = null, f.emit("warn", "Blob detached because its attachment target is no longer available."), v.detach());
         }
       });
       x = M, M.start(), A(0);
     },
-    circle: (l, b = {}) => {
+    circle: (h, p = {}) => {
       if (w)
         return;
-      if (e.renderer === "css") {
-        v.attachTo(l);
-        return;
-      }
-      const E = q.resolve(l);
+      const E = q.resolve(h);
       if (E === null) {
-        p.emit("warn", "Blob could not resolve a circle target."), C();
+        f.emit("warn", "Blob could not resolve a circle target."), k();
         return;
       }
-      F();
-      const Q = { ...e.morph, ...b };
+      I();
+      const Q = { ...e.morph, ...p };
       d = {
         kind: "circle",
         target: null,
@@ -1015,14 +1033,14 @@ function Ee(e = {}) {
         onRect: (S) => {
           if (x === M) {
             if (S.width === 0 || S.height === 0) {
-              x = null, M.stop(), p.emit("warn", "Blob detached because its circle target is no longer visible."), v.detach();
+              x = null, M.stop(), f.emit("warn", "Blob detached because its circle target is no longer visible."), v.detach();
               return;
             }
-            f.setRingAround(S, Q), H("circle", { x: S.left + S.width / 2, y: S.top + S.height / 2 }), r && A(0);
+            b.setRingAround(S, Q), H("circle", { x: S.left + S.width / 2, y: S.top + S.height / 2 }), r && A(0);
           }
         },
         onLost: () => {
-          x === M && (x = null, p.emit("warn", "Blob detached because its circle target is no longer available."), v.detach());
+          x === M && (x = null, f.emit("warn", "Blob detached because its circle target is no longer available."), v.detach());
         }
       });
       x = M, M.start(), A(0);
@@ -1030,94 +1048,94 @@ function Ee(e = {}) {
     detach: () => {
       if (w || d.kind === "idle")
         return;
-      const l = d.kind === "attach" || d.kind === "circle";
-      F(), d = {
+      const h = d.kind === "attach" || d.kind === "circle";
+      I(), d = {
         kind: "idle",
         target: null,
         direction: { x: 0, y: 0 },
         landed: !1,
         attachedElement: null,
         attachEmitted: !1
-      }, j(), l && p.emit("detach", void 0), A(0);
+      }, j(), h && f.emit("detach", void 0), A(0);
     },
     destroy: () => {
       if (w)
         return;
-      w = !0, k !== null && window.cancelAnimationFrame(k), F(), window.removeEventListener("resize", $), document.removeEventListener("visibilitychange", V), _.disable(), tt.disable(), et.disable(), O.destroy();
-      const l = Y;
+      w = !0, C !== null && window.cancelAnimationFrame(C), I(), window.removeEventListener("resize", $), document.removeEventListener("visibilitychange", V), _.disable(), tt.disable(), et.disable(), O.destroy();
+      const h = Y;
       Y = null;
       try {
-        l?.();
+        h?.();
       } finally {
-        y?.destroy(), R.destroy(), p.clear(), h.remove();
+        y?.destroy(), T.destroy(), f.clear(), l.remove();
       }
     },
-    on: (l, b) => p.on(l, b),
-    off: (l, b) => p.off(l, b)
+    on: (h, p) => f.on(h, p),
+    off: (h, p) => f.off(h, p)
   }, _ = new Nt();
   e.glitch === !0 && !r && _.enable(c);
   const tt = new Rt(() => {
-    g.name === "idle" && (y?.isSpeaking ? y.advance() : it.length > 0 ? v.start() : f.poke());
+    g.name === "idle" && (y?.isSpeaking ? y.advance() : it.length > 0 ? v.start() : b.poke());
   });
   tt.enable(u);
-  const et = new kt(
-    () => N || g.name === "circling" || !g.canTransition("dragged") ? !1 : (F(), g.transition("dragged"), !0),
-    (l) => {
-      P = l, A(0);
+  const et = new Ct(
+    () => N || g.name === "circling" || !g.canTransition("dragged") ? !1 : (I(), g.transition("dragged"), !0),
+    (h) => {
+      W = h, A(0);
     },
     () => {
-      P = null, g.name === "dragged" && g.transition("idle"), d = { kind: "idle", target: null, direction: { x: 0, y: 0 }, landed: !1, attachedElement: null, attachEmitted: !1 }, C();
+      W = null, g.name === "dragged" && g.transition("idle"), d = { kind: "idle", target: null, direction: { x: 0, y: 0 }, landed: !1, attachedElement: null, attachEmitted: !1 }, k();
     }
   );
   e.draggable !== !1 && et.enable(u);
-  const O = new Ct(e.storageKey, () => {
-    N = !0, c.hidden = !0, D?.skip(), p.emit("dismiss", void 0);
+  const O = new kt(e.storageKey, () => {
+    N = !0, c.hidden = !0, D?.skip(), f.emit("dismiss", void 0);
   }, () => {
     N = !1, c.hidden = !1, A(0);
   }, e.labels?.restore);
-  e.dismissible !== !1 ? (O.mount(h), m.addEventListener("click", () => O.dismiss()), O.isDismissed() && O.dismiss()) : m.hidden = !0;
+  e.dismissible !== !1 ? (O.mount(l), m.addEventListener("click", () => O.dismiss()), O.isDismissed() && O.dismiss()) : m.hidden = !0;
   const it = [...e.story ?? [], ...At()], nt = `${e.storageKey ?? "blob"}:story-played`;
   D = new Tt({
-    sleep: (l) => new Promise((b) => window.setTimeout(b, l)),
-    say: (l) => v.say(l),
-    moveTo: async (l, b) => {
-      v.moveTo({ x: l, y: b }), await W();
+    sleep: (h) => new Promise((p) => window.setTimeout(p, h)),
+    say: (h) => v.say(h),
+    moveTo: async (h, p) => {
+      v.moveTo({ x: h, y: p }), await z();
     },
-    attachTo: async (l, b) => {
-      v.attachTo(l, b), await W();
+    attachTo: async (h, p) => {
+      v.attachTo(h, p), await z();
     },
-    circle: async (l, b) => {
-      v.circle(l, b), await W();
+    circle: async (h, p) => {
+      v.circle(h, p), await z();
     },
     detach: async () => {
-      v.detach(), await W();
+      v.detach(), await z();
     },
     skipSpeech: () => {
       y?.advance(), y?.advance();
     },
-    onStep: (l) => p.emit("step", l),
-    onRunError: (l) => p.emit("warn", `A story step's run() failed: ${String(l)}`),
-    onEnd: (l) => {
-      if (l)
+    onStep: (h) => f.emit("step", h),
+    onRunError: (h) => f.emit("warn", `A story step's run() failed: ${String(h)}`),
+    onEnd: (h) => {
+      if (h)
         try {
           window.localStorage.setItem(nt, "true");
         } catch {
         }
-      p.emit("end", void 0);
+      f.emit("end", void 0);
     }
   }, it);
   try {
-    const l = e.script?.(v);
-    typeof l == "function" && (Y = l);
-  } catch (l) {
-    throw v.destroy(), l;
+    const h = e.script?.(v);
+    typeof h == "function" && (Y = h);
+  } catch (h) {
+    throw v.destroy(), h;
   }
   if (!w && !N && e.autoStart && !xe(nt) && v.start(), o && (console.warn(
     "[blob] prefers-reduced-motion is active: Blob will position instantly without animation. Set respectReducedMotion: false to override."
   ), y !== null && !N && e.reducedMotionNotice !== !1)) {
-    const l = e.reducedMotionNotice ?? re;
+    const h = e.reducedMotionNotice ?? re;
     queueMicrotask(() => {
-      !w && !N && v.say(l);
+      !w && !N && v.say(h);
     });
   }
   return v;
@@ -1137,10 +1155,10 @@ function he(e, t) {
 function ce(e, t) {
   return typeof e == "number" && Number.isFinite(e) ? e : t;
 }
-function bt() {
+function pt() {
   return document.documentElement.clientWidth || window.innerWidth;
 }
-function ft() {
+function bt() {
   return document.documentElement.clientHeight || window.innerHeight;
 }
 function de(e) {
@@ -1160,21 +1178,21 @@ function me(e, t, i, n) {
   if (e.hidden = s, s)
     return;
   const o = 4, r = 4, a = e.offsetWidth || 20;
-  let h, c;
+  let l, c;
   if (n && i !== null && i.top < t.top)
-    h = t.left - a - r, c = i.bottom + r;
+    l = t.left - a - r, c = i.bottom + r;
   else {
     const u = t.top - a - r >= o;
-    c = u ? t.top - a - r : t.bottom - a / 2, h = u ? t.right - a / 2 : t.right + r;
+    c = u ? t.top - a - r : t.bottom - a / 2, l = u ? t.right - a / 2 : t.right + r;
   }
-  e.style.left = `${Math.round(dt(h, o, bt() - a - o))}px`, e.style.top = `${Math.round(dt(c, o, ft() - a - o))}px`;
+  e.style.left = `${Math.round(dt(l, o, pt() - a - o))}px`, e.style.top = `${Math.round(dt(c, o, bt() - a - o))}px`;
 }
 function dt(e, t, i) {
   return Math.min(Math.max(e, t), Math.max(t, i));
 }
-function be(e, t) {
+function pe(e, t) {
   if (e.shape === "ring" && e.points.length > 0) {
-    const i = e.points.map((h) => h.x), n = e.points.map((h) => h.y), s = Math.min(...i) - e.strokeWidth / 2, o = Math.max(...i) + e.strokeWidth / 2, r = Math.min(...n) - e.strokeWidth / 2, a = Math.max(...n) + e.strokeWidth / 2;
+    const i = e.points.map((l) => l.x), n = e.points.map((l) => l.y), s = Math.min(...i) - e.strokeWidth / 2, o = Math.max(...i) + e.strokeWidth / 2, r = Math.min(...n) - e.strokeWidth / 2, a = Math.max(...n) + e.strokeWidth / 2;
     return ut(s, r, o - s, a - r);
   }
   return ut(e.center.x - t, e.center.y - t, t * 2, t * 2);
@@ -1192,24 +1210,28 @@ function ut(e, t, i, n) {
     toJSON: () => ({ bottom: t + n, height: n, left: e, right: e + i, top: t, width: i, x: e, y: t })
   };
 }
-function fe() {
+function be() {
   if (document.head.querySelector(`style[${ct}]`) !== null)
     return;
   const e = document.createElement("style");
   e.setAttribute(ct, ""), e.textContent = ee, document.head.append(e);
 }
-function pe(e, t, i) {
+function fe(e, t, i) {
   if (e.style.setProperty("--blob-color", t), i === null) return;
-  T(e, "--blob-bubble-bg", i.background), T(e, "--blob-bubble-fg", i.color), T(e, "--blob-bubble-border", i.borderColor), T(e, "--blob-bubble-border-width", i.borderWidth), T(e, "--blob-bubble-padding", i.padding), T(e, "--blob-bubble-font-size", i.fontSize), T(e, "--blob-bubble-max-width", i.maxWidth), T(e, "--blob-bubble-tail-size", i.tailSize), i.fontFamily !== void 0 && e.style.setProperty("--blob-font", i.fontFamily), i.lineHeight !== void 0 && e.style.setProperty("--blob-bubble-line-height", String(i.lineHeight)), i.shadow !== void 0 && e.style.setProperty("--blob-bubble-shadow", i.shadow);
+  if (R(e, "--blob-bubble-bg", i.background), R(e, "--blob-bubble-fg", i.color), R(e, "--blob-bubble-border", i.borderColor), R(e, "--blob-bubble-border-width", i.borderWidth), R(e, "--blob-bubble-padding", i.padding), R(e, "--blob-bubble-font-size", i.fontSize), i.maxWidth !== void 0) {
+    const s = typeof i.maxWidth == "number" ? `${i.maxWidth}px` : i.maxWidth;
+    e.style.setProperty("--blob-bubble-max-width", `min(${s}, calc(100vw - 16px))`);
+  }
+  R(e, "--blob-bubble-tail-size", i.tailSize), i.fontFamily !== void 0 && e.style.setProperty("--blob-font", i.fontFamily), i.lineHeight !== void 0 && e.style.setProperty("--blob-bubble-line-height", String(i.lineHeight)), i.shadow !== void 0 && e.style.setProperty("--blob-bubble-shadow", i.shadow);
   const n = i.borderRadius ?? ge(i.shape);
-  n !== void 0 && T(e, "--blob-bubble-radius", n);
+  n !== void 0 && R(e, "--blob-bubble-radius", n);
 }
 function ge(e) {
   if (e === "square") return 0;
   if (e === "rounded") return 12;
   if (e === "circle") return "50%";
 }
-function T(e, t, i) {
+function R(e, t, i) {
   i !== void 0 && e.style.setProperty(t, typeof i == "number" ? `${i}px` : i);
 }
 function ye(e, t) {
@@ -1220,7 +1242,8 @@ function ye(e, t) {
     ...e.gap === void 0 ? {} : { gap: e.gap },
     ...e.margin === void 0 ? {} : { margin: e.margin },
     ...e.tail === void 0 ? {} : { tail: e.tail },
-    ...e.ariaLabel === void 0 ? {} : { ariaLabel: e.ariaLabel }
+    ...e.ariaLabel === void 0 ? {} : { ariaLabel: e.ariaLabel },
+    ...e.className === void 0 ? {} : { className: e.className }
   };
 }
 function ve(e) {

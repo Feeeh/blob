@@ -107,8 +107,14 @@ export interface BlobBubbleOptions {
   fontFamily?: string;
   fontSize?: CssSize;
   lineHeight?: number | string;
+  /** Clamped to the viewport width automatically, so text fits any screen. */
   maxWidth?: CssSize;
   shadow?: string;
+  /**
+   * Extra class(es) added to the bubble element. Combine with your own
+   * stylesheet to restyle the bubble entirely, beyond the built-in options.
+   */
+  className?: string;
   /** Show the bubble pointer. Default: true. */
   tail?: boolean;
   tailSize?: CssSize;
@@ -217,6 +223,8 @@ export interface SoftBodyState {
   strokeLineCap?: CanvasLineCap;
   strokeLineJoin?: CanvasLineJoin;
   morphShape?: BlobMorphShape;
+  /** Corner radius of a rounded ring outline, in px. */
+  morphRadius?: number;
 }
 
 /** Contract every renderer implements. See blob.md §2 — renderers are dumb. */

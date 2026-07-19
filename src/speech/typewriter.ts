@@ -5,6 +5,8 @@ export type TypewriterState = 'idle' | 'typing' | 'waiting';
 export interface TypewriterOptions {
   characterDelay?: number;
   reducedMotion?: boolean;
+  /** Fired each time a line finishes typing and starts waiting for an advance. */
+  onTypingComplete?: () => void;
 }
 
 export class Typewriter {
@@ -15,6 +17,8 @@ export class Typewriter {
   private visibleCount = 0;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private resolveAdvance: (() => void) | null = null;
+  private typingStart = 0;
+  private readonly onTypingComplete: (() => void) | undefined;
 
   constructor(
     private readonly onUpdate: (text: string) => void,
@@ -22,6 +26,7 @@ export class Typewriter {
   ) {
     this.characterDelay = positiveDelay(options.characterDelay, 35);
     this.reducedMotion = options.reducedMotion ?? false;
+    this.onTypingComplete = options.onTypingComplete;
   }
 
   get isActive(): boolean {
@@ -44,6 +49,7 @@ export class Typewriter {
       }
 
       this.state = 'typing';
+      this.typingStart = Date.now();
       this.scheduleNextCharacter();
     });
   }
@@ -68,7 +74,17 @@ export class Typewriter {
   private scheduleNextCharacter(): void {
     this.timer = setTimeout(() => {
       this.timer = null;
-      this.visibleCount += 1;
+      // Reveal by elapsed wall time, not one character per tick: on a busy main
+      // thread (older phones) late timers then catch up instead of drifting,
+      // so a line always finishes in about length * characterDelay.
+      const elapsed = Date.now() - this.typingStart;
+      const due = this.characterDelay > 0
+        ? Math.floor(elapsed / this.characterDelay)
+        : this.characters.length;
+      this.visibleCount = Math.min(
+        this.characters.length,
+        Math.max(this.visibleCount + 1, due),
+      );
       this.onUpdate(this.characters.slice(0, this.visibleCount).join(''));
 
       if (this.visibleCount >= this.characters.length) {
@@ -84,6 +100,7 @@ export class Typewriter {
     this.visibleCount = this.characters.length;
     this.onUpdate(this.characters.join(''));
     this.state = 'waiting';
+    this.onTypingComplete?.();
   }
 
   private finish(): void {
