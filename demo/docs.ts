@@ -30,6 +30,11 @@ function remount(next: BlobOptions, line?: string): void {
   }
 }
 
+/** Bring an example target on-screen before Blob travels to it. */
+function focusTarget(selector: string): void {
+  document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 const actions: Record<string, () => void> = {
   'hello': () => void blob.say('Hello! Click me or this bubble to advance.'),
   'poke-hint': () =>
@@ -77,24 +82,36 @@ const actions: Record<string, () => void> = {
       'This whole look comes from one CSS class.',
     ),
 
-  'morph-rounded': () => blob.circle('#morph-target', { shape: 'rounded', radius: 16 }),
-  'morph-circle': () => blob.circle('#morph-target', { shape: 'circle' }),
-  'morph-rectangle': () => blob.circle('#morph-target', { shape: 'rectangle' }),
-  'morph-pink': () =>
-    blob.circle('#morph-target', { shape: 'rounded', radius: 20, strokeColor: '#ec4899', strokeWidth: 10, padding: 10 }),
+  'morph-rounded': () => { focusTarget('#morph-target'); blob.circle('#morph-target', { shape: 'rounded', radius: 16 }); },
+  'morph-circle': () => { focusTarget('#morph-target'); blob.circle('#morph-target', { shape: 'circle' }); },
+  'morph-rectangle': () => { focusTarget('#morph-target'); blob.circle('#morph-target', { shape: 'rectangle' }); },
+  'morph-pink': () => {
+    focusTarget('#morph-target');
+    blob.circle('#morph-target', { shape: 'rounded', radius: 20, strokeColor: '#ec4899', strokeWidth: 10, padding: 10 });
+  },
   'detach': () => blob.detach(),
 
-  'attach-top': () => blob.attachTo('#attach-target', { side: 'top', gap: 8 }),
-  'attach-right': () => blob.attachTo('#attach-target', { side: 'right', gap: 8 }),
-  'attach-bottom': () => blob.attachTo('#attach-target', { side: 'bottom', gap: 8 }),
-  'attach-left': () => blob.attachTo('#attach-target', { side: 'left', gap: 8 }),
+  'attach-top': () => { focusTarget('#attach-target'); blob.attachTo('#attach-target', { side: 'top', gap: 8 }); },
+  'attach-right': () => { focusTarget('#attach-target'); blob.attachTo('#attach-target', { side: 'right', gap: 8 }); },
+  'attach-bottom': () => { focusTarget('#attach-target'); blob.attachTo('#attach-target', { side: 'bottom', gap: 8 }); },
+  'attach-left': () => { focusTarget('#attach-target'); blob.attachTo('#attach-target', { side: 'left', gap: 8 }); },
 
   'story': () => {
     remount({
       story: [
         { sleep: 300, say: 'A story is just a list of steps like this one.' },
-        { attachTo: '#attach-target', attach: { side: 'top' }, say: 'Each step can travel somewhere...' },
-        { circle: '#morph-target', morph: { shape: 'rounded' }, say: '...morph around something...' },
+        {
+          run: () => focusTarget('#attach-target'),
+          attachTo: '#attach-target',
+          attach: { side: 'top' },
+          say: 'Each step can travel somewhere...',
+        },
+        {
+          run: () => focusTarget('#morph-target'),
+          circle: '#morph-target',
+          morph: { shape: 'rounded' },
+          say: '...morph around something...',
+        },
         { detach: true, say: 'and then let go. The end!' },
       ],
     });

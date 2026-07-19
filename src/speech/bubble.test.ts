@@ -98,20 +98,24 @@ describe('SpeechBubble', () => {
     expect(elements[0]?.hidden).toBe(true);
   });
 
-  it('repositions after typed text changes the measured bubble width', () => {
+  it('locks the bubble to the full line size so typing never moves it', () => {
     vi.useFakeTimers();
     const { elements, host } = installBubbleEnvironment();
     const bubble = new SpeechBubble({ characterDelay: 10 });
     bubble.mount(host);
     bubble.follow(rect(140, 100, 40, 40));
-    const element = elements[0]!;
+    const element = elements[0]! as HTMLElement & { style: { minWidth?: string; minHeight?: string } };
 
     void bubble.say('hi');
+    // Measured once with the complete text, before the first character shows.
+    expect(element.style.minWidth).toBe('100px');
+    expect(element.style.minHeight).toBe('48px');
     expect(element.style.left).toBe('110px');
+
+    // Even if the element reports a new size mid-line, the position holds.
     Object.defineProperty(element, 'offsetWidth', { configurable: true, value: 200 });
     vi.advanceTimersByTime(10);
-
-    expect(element.style.left).toBe('60px');
+    expect(element.style.left).toBe('110px');
   });
 
   it('automatically advances a line when configured', async () => {

@@ -65,9 +65,10 @@ export class SpeechBubble {
     this.liveRegion = liveRegion;
     this.typewriter = new Typewriter(
       (text) => {
+        // No measuring here: the bubble is locked to the full line's size in
+        // say(), so the box never moves or re-wraps while characters stream in.
         if (this.textElement !== null) {
           this.textElement.textContent = text;
-          this.measure();
           this.reposition();
         }
       },
@@ -76,7 +77,7 @@ export class SpeechBubble {
   }
 
   say(text: string): Promise<void> {
-    if (this.element === null || this.liveRegion === null || this.typewriter === null) {
+    if (this.element === null || this.textElement === null || this.liveRegion === null || this.typewriter === null) {
       throw new Error('SpeechBubble must be mounted before it can speak.');
     }
 
@@ -86,6 +87,15 @@ export class SpeechBubble {
     this.liveRegion.textContent = text;
     this.clearAutoAdvance();
     this.currentTextLength = Array.from(text).length;
+    // Lock the bubble to the complete line's size before typing starts, so the
+    // box shows up at its final width and height and only the text fills in.
+    // Everything below runs in one task, so the full text never paints early.
+    this.element.style.minWidth = '';
+    this.element.style.minHeight = '';
+    this.textElement.textContent = text;
+    this.measure();
+    this.element.style.minWidth = `${this.measuredWidth}px`;
+    this.element.style.minHeight = `${this.measuredHeight}px`;
     const speech = this.typewriter.play(text);
     return speech.then(() => {
       if (this.speechId === speechId) {

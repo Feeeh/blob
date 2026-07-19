@@ -790,16 +790,16 @@ class te {
     const i = document.createElement("button"), n = document.createElement("span"), s = document.createElement("div");
     i.className = "blob-bubble", i.type = "button", i.hidden = !0, i.setAttribute("aria-label", this.options.ariaLabel ?? "Advance speech"), s.className = "blob-sr-only", s.setAttribute("aria-live", "polite"), s.setAttribute("aria-atomic", "true"), i.append(n), i.addEventListener("click", this.handleAdvance), t.append(i, s), this.element = i, this.textElement = n, this.liveRegion = s, this.typewriter = new jt(
       (o) => {
-        this.textElement !== null && (this.textElement.textContent = o, this.measure(), this.reposition());
+        this.textElement !== null && (this.textElement.textContent = o, this.reposition());
       },
       { ...this.options, onTypingComplete: this.handleTypingComplete }
     );
   }
   say(t) {
-    if (this.element === null || this.liveRegion === null || this.typewriter === null)
+    if (this.element === null || this.textElement === null || this.liveRegion === null || this.typewriter === null)
       throw new Error("SpeechBubble must be mounted before it can speak.");
     const i = this.speechId + 1;
-    return this.speechId = i, this.element.hidden = !1, this.liveRegion.textContent = t, this.clearAutoAdvance(), this.currentTextLength = Array.from(t).length, this.typewriter.play(t).then(() => {
+    return this.speechId = i, this.element.hidden = !1, this.liveRegion.textContent = t, this.clearAutoAdvance(), this.currentTextLength = Array.from(t).length, this.element.style.minWidth = "", this.element.style.minHeight = "", this.textElement.textContent = t, this.measure(), this.element.style.minWidth = `${this.measuredWidth}px`, this.element.style.minHeight = `${this.measuredHeight}px`, this.typewriter.play(t).then(() => {
       this.speechId === i && (this.clearAutoAdvance(), this.hide());
     });
   }
