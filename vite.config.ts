@@ -11,6 +11,12 @@ export default defineConfig(({ mode }) => ({
     ? {
         outDir: resolve(__dirname, 'demo-dist'),
         emptyOutDir: true,
+        rollupOptions: {
+          input: {
+            index: resolve(__dirname, 'demo/index.html'),
+            docs: resolve(__dirname, 'demo/docs.html'),
+          },
+        },
       }
     : {
         outDir: resolve(__dirname, 'dist'),

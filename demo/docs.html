@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blob - documentation</title>
+  <!-- CDNs are demo-only conveniences; the library itself makes no third-party requests. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    .pixel-font { font-family: 'Press Start 2P', monospace; }
+    code { font-size: 0.85em; }
+    pre code { font-size: 0.8rem; line-height: 1.6; }
+
+    /* Example of restyling the bubble entirely via bubble.className. */
+    .docs-neon-bubble {
+      background: linear-gradient(135deg, #0f172a, #1e1b4b) !important;
+      color: #a5f3fc !important;
+      border: 1px solid #22d3ee !important;
+      border-radius: 18px !important;
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.45) !important;
+      font-family: 'Courier New', monospace !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased">
+  <nav class="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <a href="./index.html" class="pixel-font text-sm text-purple-400">BLOB</a>
+      <div class="flex items-center gap-6">
+        <ul class="hidden gap-5 text-sm text-slate-300 md:flex">
+          <li><a href="#start" class="transition hover:text-purple-400">Start</a></li>
+          <li><a href="#options" class="transition hover:text-purple-400">Options</a></li>
+          <li><a href="#bubble" class="transition hover:text-purple-400">Bubble</a></li>
+          <li><a href="#morph" class="transition hover:text-purple-400">Morph</a></li>
+          <li><a href="#story" class="transition hover:text-purple-400">Story</a></li>
+          <li><a href="#api" class="transition hover:text-purple-400">API</a></li>
+        </ul>
+        <select id="renderer-select" aria-label="Blob renderer" class="border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200">
+          <option value="canvas2d">Canvas</option>
+          <option value="svg">SVG</option>
+          <option value="css">CSS</option>
+        </select>
+      </div>
+    </div>
+  </nav>
+
+  <header class="mx-auto max-w-5xl px-6 pb-10 pt-20">
+    <p class="pixel-font mb-6 text-xs text-purple-400">DOCUMENTATION</p>
+    <h1 class="text-4xl font-bold tracking-tight">Everything Blob can do.</h1>
+    <p class="mt-6 max-w-2xl text-slate-400">
+      Blob is a zero-dependency TypeScript companion that lives in the corner of your page,
+      speaks through a pixel bubble, travels to elements, and morphs around them.
+      Every option on this page is live: the Blob in the corner reacts to the
+      <span class="text-purple-300">Try it</span> buttons in each section.
+    </p>
+  </header>
+
+  <main class="mx-auto max-w-5xl space-y-20 px-6 pb-32">
+
+    <!-- ============================== GETTING STARTED ============================== -->
+    <section id="start">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">GETTING STARTED</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        Call <code class="text-purple-300">createBlob()</code> after the document body exists.
+        With no arguments you get an idle, bobbing purple blob in the bottom-right corner —
+        every option below is optional.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>import { createBlob } from 'blob';
+
+const blob = createBlob();          // idle companion, nothing else
+blob.say('Hello!');                 // one-off speech line</code></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button data-try="hello" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Try it — say hello</button>
+        <button data-try="poke-hint" class="rounded border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-purple-500">What does clicking Blob do?</button>
+      </div>
+      <p class="mt-4 max-w-2xl text-sm text-slate-500">
+        Clicking Blob itself pokes it (a squishy ripple), advances speech while it is talking,
+        or starts its story if one is waiting. Dragging it is on by default and it springs back home.
+      </p>
+    </section>
+
+    <!-- ============================== TOP-LEVEL OPTIONS ============================== -->
+    <section id="options">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">ALL OPTIONS</h2>
+      <p class="mb-6 max-w-2xl text-slate-400">
+        The full <code class="text-purple-300">BlobOptions</code> object. Everything is optional;
+        defaults are shown. Each group links to its own section below.
+      </p>
+      <div class="overflow-x-auto rounded-lg border border-slate-800">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-900 text-slate-300">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Option</th>
+              <th class="px-4 py-3 font-semibold">Type</th>
+              <th class="px-4 py-3 font-semibold">Default</th>
+              <th class="px-4 py-3 font-semibold">What it does</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 text-slate-400">
+            <tr><td class="px-4 py-3"><code class="text-purple-300">renderer</code></td><td class="px-4 py-3"><code>'canvas2d' | 'svg' | 'css'</code> or a custom object</td><td class="px-4 py-3"><code>'canvas2d'</code></td><td class="px-4 py-3">How the body is drawn. See <a href="#renderers" class="text-purple-300 underline">Renderers</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">body</code></td><td class="px-4 py-3"><code>{ color, size, points }</code></td><td class="px-4 py-3"><code>#8b5cf6, 48, 48</code></td><td class="px-4 py-3">Color, resting radius in px, and number of physics points (min 3).</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">color</code> / <code class="text-purple-300">size</code></td><td class="px-4 py-3"><code>string</code> / <code>number</code></td><td class="px-4 py-3">same</td><td class="px-4 py-3">Shorthand for <code>body.color</code> / <code>body.size</code>; <code>body</code> wins if both are set.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">physics</code></td><td class="px-4 py-3"><code>object | false</code></td><td class="px-4 py-3">springs on</td><td class="px-4 py-3">Tune springs and idle motion, or <code>false</code> for instant, static positioning. See <a href="#physics" class="text-purple-300 underline">Physics</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">bubble</code></td><td class="px-4 py-3"><code>object | false</code></td><td class="px-4 py-3">pixel bubble</td><td class="px-4 py-3">Speech bubble style, fonts and timing, or <code>false</code> to mute visuals. See <a href="#bubble" class="text-purple-300 underline">Bubble</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">attachment</code></td><td class="px-4 py-3"><code>{ gap, side }</code></td><td class="px-4 py-3"><code>0, 'nearest'</code></td><td class="px-4 py-3">Default resting spot next to attached elements. See <a href="#attachment" class="text-purple-300 underline">Attachment</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">morph</code></td><td class="px-4 py-3"><code>object</code></td><td class="px-4 py-3">rounded ring</td><td class="px-4 py-3">Default outline drawn when Blob wraps an element. See <a href="#morph" class="text-purple-300 underline">Morph</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">autoStart</code></td><td class="px-4 py-3"><code>boolean</code></td><td class="px-4 py-3"><code>false</code></td><td class="px-4 py-3">Play the story on load instead of waiting for a click. Plays once per visitor (see <code>storageKey</code>).</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">draggable</code></td><td class="px-4 py-3"><code>boolean</code></td><td class="px-4 py-3"><code>true</code></td><td class="px-4 py-3">Let visitors drag Blob around; it springs back home when released.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">glitch</code></td><td class="px-4 py-3"><code>boolean</code></td><td class="px-4 py-3"><code>false</code></td><td class="px-4 py-3">Random corrupted-signal bursts over Blob's visuals. Disabled under reduced motion.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">dismissible</code></td><td class="px-4 py-3"><code>boolean</code></td><td class="px-4 py-3"><code>true</code></td><td class="px-4 py-3">Show an X to hide Blob, persisted per visitor, with a restore chip.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">respectReducedMotion</code></td><td class="px-4 py-3"><code>boolean</code></td><td class="px-4 py-3"><code>true</code></td><td class="px-4 py-3">Disable animation for visitors with <code>prefers-reduced-motion</code>. See <a href="#a11y" class="text-purple-300 underline">Accessibility</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">reducedMotionNotice</code></td><td class="px-4 py-3"><code>string | false</code></td><td class="px-4 py-3">built-in text</td><td class="px-4 py-3">The line Blob speaks when reduced motion turns animation off; pass a string to localize or <code>false</code> to stay quiet.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">storageKey</code></td><td class="px-4 py-3"><code>string</code></td><td class="px-4 py-3"><code>'blob'</code></td><td class="px-4 py-3">localStorage namespace for "dismissed" and "story already played".</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">labels</code></td><td class="px-4 py-3"><code>{ guide, dismiss, restore }</code></td><td class="px-4 py-3">English</td><td class="px-4 py-3">Accessible names for Blob's controls; override to localize.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">zIndex</code></td><td class="px-4 py-3"><code>number</code></td><td class="px-4 py-3"><code>2147483000</code></td><td class="px-4 py-3">Stacking level of Blob's fixed layer.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">story</code></td><td class="px-4 py-3"><code>StoryStep[]</code></td><td class="px-4 py-3"><code>[]</code></td><td class="px-4 py-3">The guided tour. See <a href="#story" class="text-purple-300 underline">Story</a>.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">script</code></td><td class="px-4 py-3"><code>(blob) =&gt; cleanup?</code></td><td class="px-4 py-3">—</td><td class="px-4 py-3">Imperative behavior after mount: subscribe to events, drive the controller. Return a cleanup function if needed.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================== BODY ============================== -->
+    <section id="body-options">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">BODY</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        The soft body is a ring of spring-driven points. More points mean a smoother outline;
+        fewer make it lumpier and cheaper.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>createBlob({
+  body: {
+    color: '#0ea5e9',   // any CSS color
+    size: 32,           // resting radius in px (default 48)
+    points: 48,         // physics points around the body, min 3 (default 48)
+  },
+});</code></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button data-try="body-sky" class="rounded border border-sky-500 px-4 py-2 text-sm text-sky-300 transition hover:bg-sky-500/10">Try it — small sky blob</button>
+        <button data-try="body-big" class="rounded border border-pink-500 px-4 py-2 text-sm text-pink-300 transition hover:bg-pink-500/10">Try it — big pink blob</button>
+        <button data-try="reset" class="rounded border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-purple-500">Reset to default</button>
+      </div>
+    </section>
+
+    <!-- ============================== PHYSICS ============================== -->
+    <section id="physics">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">PHYSICS</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        Movement runs on damped springs; idle life comes from a bob and a breathe cycle.
+        Pass <code class="text-purple-300">physics: false</code> to turn all motion off — Blob then
+        positions instantly, which is also what <code>prefers-reduced-motion</code> does automatically.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>createBlob({
+  physics: {
+    stiffness: 170,        // spring stiffness; higher = snappier travel
+    damping: undefined,    // defaults to critical damping for the stiffness
+    bobAmplitude: 6,       // idle up/down float in px
+    bobFrequency: 1.8,     // idle float speed
+    breatheAmplitude: 0.06,// idle outline wobble, fraction of body size
+    breatheFrequency: 2.4, // outline wobble speed
+    pokeStrength: 180,     // ripple strength when clicked
+    landingSquish: 0.25,   // squash on arrival, in the travel direction
+  },
+});
+
+createBlob({ physics: false }); // no animation at all</code></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button data-try="physics-bouncy" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Try it — extra bouncy</button>
+        <button data-try="physics-calm" class="rounded border border-slate-500 px-4 py-2 text-sm text-slate-300 transition hover:bg-slate-500/10">Try it — calm and stiff</button>
+        <button data-try="reset" class="rounded border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-purple-500">Reset to default</button>
+      </div>
+    </section>
+
+    <!-- ============================== BUBBLE ============================== -->
+    <section id="bubble">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">BUBBLE, FONTS &amp; CLASSES</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        Every visual of the speech bubble is an option. Sizes accept a number (px) or any CSS
+        length string. <code class="text-purple-300">maxWidth</code> is automatically clamped to the
+        viewport, so long lines wrap instead of overflowing small screens.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>createBlob({
+  bubble: {
+    background: '#ffffff',
+    color: '#1f1235',                    // text color
+    borderColor: '#1f1235',
+    borderWidth: 4,
+    shape: 'square',                     // 'square' | 'rounded' | 'circle' preset
+    borderRadius: 14,                    // overrides the shape preset
+    padding: 12,
+    fontFamily: "'Blob Pixel', monospace", // bundled pixel font, or any font you load
+    fontSize: 10,
+    lineHeight: 1.7,
+    maxWidth: 280,                       // clamped to the viewport automatically
+    shadow: '4px 4px 0 #8b5cf6',
+    tail: true,                          // the pointer under the bubble
+    tailSize: 8,
+    gap: 16,                             // px between Blob and the bubble
+    margin: 8,                           // min px from the viewport edge
+    characterDelay: 35,                  // ms per typed character
+    autoAdvance: 800,                    // dwell ms after typing; omit = click to advance
+    ariaLabel: 'Advance speech',
+  },
+});
+
+createBlob({ bubble: false });           // Blob never speaks visually</code></pre>
+
+      <h3 class="mb-3 mt-8 font-semibold text-slate-200">Using your own font</h3>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        Load the font however your page already does (Google Fonts <code>&lt;link&gt;</code>,
+        <code>@font-face</code>, anything) and name it in
+        <code class="text-purple-300">fontFamily</code>. Blob ships with the pixel font
+        <code>'Blob Pixel'</code> and uses it by default.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>&lt;link href="https://fonts.googleapis.com/css2?family=Inter&amp;display=swap" rel="stylesheet"&gt;
+
+createBlob({ bubble: { fontFamily: 'Inter, sans-serif', fontSize: 14 } });</code></pre>
+
+      <h3 class="mb-3 mt-8 font-semibold text-slate-200">Restyle it entirely with a class</h3>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        When the built-in options are not enough, pass
+        <code class="text-purple-300">bubble.className</code>. The class is kept on the bubble
+        element, so your stylesheet can take over completely.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>/* your CSS */
+.docs-neon-bubble {
+  background: linear-gradient(135deg, #0f172a, #1e1b4b) !important;
+  color: #a5f3fc !important;
+  border: 1px solid #22d3ee !important;
+  border-radius: 18px !important;
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.45) !important;
+}
+
+createBlob({ bubble: { className: 'docs-neon-bubble' } });</code></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button data-try="bubble-default" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Try it — pixel default</button>
+        <button data-try="bubble-soft" class="rounded border border-emerald-500 px-4 py-2 text-sm text-emerald-300 transition hover:bg-emerald-500/10">Try it — soft rounded</button>
+        <button data-try="bubble-neon" class="rounded border border-cyan-500 px-4 py-2 text-sm text-cyan-300 transition hover:bg-cyan-500/10">Try it — className neon</button>
+      </div>
+    </section>
+
+    <!-- ============================== MORPH ============================== -->
+    <section id="morph">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">MORPH</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        <code class="text-purple-300">circle()</code> expands Blob's whole body into a ring that
+        wraps an element. The outline works on every renderer — canvas and SVG draw the springy
+        outline, the CSS renderer draws a hollow bordered box.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>blob.circle('#target', {
+  shape: 'rounded',        // 'circle' | 'square' | 'rectangle' | 'rounded'
+  padding: 14,             // px between the target and the outline
+  radius: 20,              // corner radius for 'rounded'
+  strokeColor: '#f472b6',  // defaults to the body color
+  strokeWidth: 5,          // defaults to body size * 0.55 (min 8)
+  lineCap: 'round',
+  lineJoin: 'round',
+});
+
+blob.detach();             // release and return home</code></pre>
+      <div class="my-6 flex justify-center">
+        <div id="morph-target" class="rounded-lg border border-slate-800 bg-slate-900 px-10 py-8 text-center">
+          <p class="font-semibold">Morph target</p>
+          <p class="mt-1 text-sm text-slate-400">Use the buttons to wrap me.</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button data-try="morph-rounded" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Rounded</button>
+        <button data-try="morph-circle" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Circle</button>
+        <button data-try="morph-rectangle" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Rectangle</button>
+        <button data-try="morph-pink" class="rounded border border-pink-500 px-4 py-2 text-sm text-pink-300 transition hover:bg-pink-500/10">Thick pink stroke</button>
+        <button data-try="detach" class="rounded border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-purple-500">Detach</button>
+      </div>
+    </section>
+
+    <!-- ============================== ATTACHMENT ============================== -->
+    <section id="attachment">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">ATTACHMENT</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        <code class="text-purple-300">attachTo()</code> makes Blob travel to an element and rest
+        against one of its edges. It follows the element while the page scrolls or resizes, and
+        detaches by itself if the target disappears.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>blob.attachTo('#target', {
+  side: 'top',   // 'nearest' | 'top' | 'right' | 'bottom' | 'left'
+  gap: 10,       // extra px between Blob and the target
+});</code></pre>
+      <div class="my-6 flex justify-center">
+        <div id="attach-target" class="rounded-lg border border-slate-800 bg-slate-900 px-10 py-8 text-center">
+          <p class="font-semibold">Attachment target</p>
+          <p class="mt-1 text-sm text-slate-400">Blob rests on the side you pick.</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button data-try="attach-top" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Top</button>
+        <button data-try="attach-right" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Right</button>
+        <button data-try="attach-bottom" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Bottom</button>
+        <button data-try="attach-left" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Left</button>
+        <button data-try="detach" class="rounded border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-purple-500">Detach</button>
+      </div>
+    </section>
+
+    <!-- ============================== STORY ============================== -->
+    <section id="story">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">STORY</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        A story is an ordered list of steps. Fields combine within one step: it sleeps, runs your
+        code, travels, then speaks. Speech waits for a click to advance unless
+        <code class="text-purple-300">bubble.autoAdvance</code> is set.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>createBlob({
+  autoStart: true,
+  story: [
+    { sleep: 600 },                                       // wait 600 ms
+    { say: 'Welcome!' },                                  // speak a line
+    { attachTo: '#nav', attach: { side: 'bottom' }, say: 'Start here.' },
+    { run: () => openMenu() },                            // your own page action
+    { circle: '#projects', morph: { shape: 'rectangle' }, say: 'The work.' },
+    { moveTo: { x: 200, y: 300 } },                       // viewport coordinate
+    { detach: true },                                     // release, go home
+  ],
+});</code></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button data-try="story" class="rounded border border-purple-500 px-4 py-2 text-sm text-purple-300 transition hover:bg-purple-500/10">Try it — play a mini story</button>
+        <button data-try="skip" class="rounded border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-purple-500">Skip story</button>
+      </div>
+
+      <h3 class="mb-3 mt-8 font-semibold text-slate-200">No-script stories with data attributes</h3>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        Elements marked with <code class="text-purple-300">data-blob-order</code> are compiled into
+        story steps and appended after <code>options.story</code>, ordered by that number.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>&lt;section
+  data-blob-order="1"
+  data-blob-sleep="500"
+  data-blob-say="This is the hero section."
+  data-blob-action="circle"
+  data-blob-detach&gt;
+  ...
+&lt;/section&gt;</code></pre>
+      <ul class="mt-4 max-w-2xl list-disc space-y-1 pl-5 text-sm text-slate-500">
+        <li><code>data-blob-order</code> — position in the story (required).</li>
+        <li><code>data-blob-sleep</code> — optional wait in ms before the step.</li>
+        <li><code>data-blob-say</code> — line to speak at this element.</li>
+        <li><code>data-blob-action="circle"</code> — wrap the element; omit to attach beside it instead.</li>
+        <li><code>data-blob-detach</code> — release and go home after this step.</li>
+      </ul>
+      <p class="mt-4 max-w-2xl text-sm text-slate-500">
+        With <code>autoStart</code>, a completed story is remembered per visitor under
+        <code>storageKey</code> and will not replay on the next visit; an aborted one gets another chance.
+      </p>
+    </section>
+
+    <!-- ============================== API ============================== -->
+    <section id="api">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">CONTROLLER API &amp; EVENTS</h2>
+      <p class="mb-6 max-w-2xl text-slate-400">
+        <code class="text-purple-300">createBlob()</code> returns a controller. The
+        <code class="text-purple-300">script</code> option receives the same controller right after mount.
+      </p>
+      <div class="overflow-x-auto rounded-lg border border-slate-800">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-900 text-slate-300">
+            <tr><th class="px-4 py-3 font-semibold">Method</th><th class="px-4 py-3 font-semibold">What it does</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 text-slate-400">
+            <tr><td class="px-4 py-3"><code class="text-purple-300">start()</code></td><td class="px-4 py-3">Play the story from the beginning.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">pause()</code></td><td class="px-4 py-3">Pause the story after the current step.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">skip()</code></td><td class="px-4 py-3">Jump to the end of the story.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">say(text)</code></td><td class="px-4 py-3">Speak one line outside the story; resolves when advanced.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">moveTo({ x, y })</code></td><td class="px-4 py-3">Travel to a viewport coordinate.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">attachTo(target, options?)</code></td><td class="px-4 py-3">Travel to an element (selector or element) and rest on its edge.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">circle(target, options?)</code></td><td class="px-4 py-3">Morph into a ring around an element.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">detach()</code></td><td class="px-4 py-3">Release the current target and return home.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">destroy()</code></td><td class="px-4 py-3">Remove Blob and everything it created from the DOM.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">on(event, handler)</code> / <code class="text-purple-300">off(event, handler)</code></td><td class="px-4 py-3">Subscribe to events (below).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-6 overflow-x-auto rounded-lg border border-slate-800">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-900 text-slate-300">
+            <tr><th class="px-4 py-3 font-semibold">Event</th><th class="px-4 py-3 font-semibold">Payload</th><th class="px-4 py-3 font-semibold">Fires when</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 text-slate-400">
+            <tr><td class="px-4 py-3"><code class="text-purple-300">start</code></td><td class="px-4 py-3">—</td><td class="px-4 py-3">The story begins.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">step</code></td><td class="px-4 py-3"><code>StoryStep</code></td><td class="px-4 py-3">Each story step begins (great for scrolling the page).</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">say</code></td><td class="px-4 py-3"><code>string</code></td><td class="px-4 py-3">A speech line starts.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">attach</code> / <code class="text-purple-300">circle</code></td><td class="px-4 py-3"><code>HTMLElement</code></td><td class="px-4 py-3">Blob lands on / wraps its target.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">detach</code></td><td class="px-4 py-3">—</td><td class="px-4 py-3">Blob releases a target.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">end</code></td><td class="px-4 py-3">—</td><td class="px-4 py-3">The story finishes or is skipped.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">dismiss</code></td><td class="px-4 py-3">—</td><td class="px-4 py-3">The visitor hides Blob.</td></tr>
+            <tr><td class="px-4 py-3"><code class="text-purple-300">warn</code></td><td class="px-4 py-3"><code>string</code></td><td class="px-4 py-3">A non-fatal problem, e.g. a story target no longer exists.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre class="mt-6 overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>createBlob({
+  script(blob) {
+    blob.on('step', (step) => {
+      if (typeof step.circle === 'string') {
+        document.querySelector(step.circle)?.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+    blob.on('end', () => void blob.say('That is the tour!'));
+    return () => console.log('cleanup on destroy');
+  },
+});</code></pre>
+
+      <h3 class="mb-3 mt-8 font-semibold text-slate-200">Reusable characters</h3>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        A character is just an options object. <code class="text-purple-300">defineBlobCharacter</code>
+        adds TypeScript autocomplete and nothing else — plain JavaScript works the same.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>// characters/guide.ts
+import { defineBlobCharacter } from 'blob';
+export default defineBlobCharacter({ body: { color: '#0ea5e9' }, story: [ /* ... */ ] });
+
+// app.ts
+import { createBlob } from 'blob';
+import guide from './characters/guide';
+createBlob(guide);</code></pre>
+    </section>
+
+    <!-- ============================== RENDERERS ============================== -->
+    <section id="renderers">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">RENDERERS</h2>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        Three built-ins — try them with the selector in the top bar. <code>canvas2d</code> (default)
+        and <code>svg</code> draw the full springy outline; <code>css</code> is a lightweight
+        div-based fallback. All three support the morph ring.
+      </p>
+      <p class="mb-4 max-w-2xl text-slate-400">
+        A custom renderer is the escape hatch for a fully bespoke character. It receives a
+        <code class="text-purple-300">SoftBodyState</code> every frame — center, perimeter points,
+        color, and the morph stroke settings — and owns no physics or behavior.
+      </p>
+      <pre class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-5"><code>const sprite = {
+  mount(host: HTMLElement) { /* create your DOM/canvas inside host */ },
+  render(state: SoftBodyState) {
+    // state.center, state.points, state.color,
+    // state.shape ('solid' | 'ring'), state.strokeWidth, state.strokeColor,
+    // state.morphShape, state.morphRadius
+  },
+  resize() { /* optional viewport-resize hook */ },
+  destroy() { /* remove everything mount() created */ },
+};
+
+createBlob({ renderer: sprite });</code></pre>
+    </section>
+
+    <!-- ============================== ACCESSIBILITY ============================== -->
+    <section id="a11y">
+      <h2 class="pixel-font mb-6 text-sm text-purple-400">ACCESSIBILITY</h2>
+      <ul class="max-w-2xl list-disc space-y-3 pl-5 text-slate-400">
+        <li>Speech is mirrored to a polite <code>aria-live</code> region, complete lines at a time, so screen readers hear the text without the typewriter noise.</li>
+        <li>Blob and its bubble are real buttons with accessible labels — keyboard users can focus and advance them; override the labels via <code class="text-purple-300">labels</code> and <code class="text-purple-300">bubble.ariaLabel</code>.</li>
+        <li><code>prefers-reduced-motion</code> disables all animation by default: Blob positions instantly, speech renders whole lines, and auto-advance dwell is scaled up so lines stay readable. Blob announces this once (customize with <code class="text-purple-300">reducedMotionNotice</code>).</li>
+        <li>The dismiss X hides Blob entirely and is remembered per visitor; a small chip restores it.</li>
+        <li>On slow devices the typewriter reveals by elapsed time, so phrases always finish and are never skipped mid-line.</li>
+      </ul>
+    </section>
+
+    <p class="border-t border-slate-800 pt-10 text-sm text-slate-500">
+      Back to the <a href="./index.html" class="text-purple-300 underline">live demo</a> ·
+      Blob is GPL-3.0 and dependency-free.
+    </p>
+  </main>
+
+  <script type="module" src="./docs.ts"></script>
+</body>
+</html>
