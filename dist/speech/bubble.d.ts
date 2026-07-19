@@ -21,8 +21,6 @@ export declare class SpeechBubble {
     private typewriter;
     private anchor;
     private speechId;
-    private measuredWidth;
-    private measuredHeight;
     private currentTextLength;
     private autoAdvanceTimer;
     constructor(options?: SpeechBubbleOptions);
@@ -38,7 +36,6 @@ export declare class SpeechBubble {
     destroy(): void;
     private readonly handleAdvance;
     private reposition;
-    private measure;
     /**
      * The dwell starts only once the line has actually finished typing, so a
      * slow device (late timers) can never auto-dismiss a half-typed phrase.

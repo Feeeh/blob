@@ -320,8 +320,8 @@ class st {
     this.value = t, this.target = t, this.velocity = 0;
   }
 }
-const mt = 48, Dt = 6, Ot = 1.8, rt = 2.4, ot = 0.06, Bt = 320, Wt = 0.1;
-class Pt {
+const mt = 48, Dt = 6, Ot = 1.8, rt = 2.4, ot = 0.06, Bt = 320, Pt = 0.1;
+class Wt {
   constructor(t = mt, i = 48, n = "#8b5cf6", s = !1, o = {}) {
     if (this.radius = i, this.color = n, this.reducedMotion = s, this.physics = o, !Number.isInteger(t) || t < 3)
       throw new RangeError("SoftBody requires at least three perimeter points.");
@@ -424,7 +424,7 @@ class Pt {
   }
   update(t) {
     this.initialized || this.setIdleAt({ x: 0, y: 0 });
-    const i = Number.isFinite(t) ? Math.min(Math.max(t, 0), Wt) : 0;
+    const i = Number.isFinite(t) ? Math.min(Math.max(t, 0), Pt) : 0;
     this.reducedMotion ? (this.centerX.snap(this.centerX.target), this.centerY.snap(this.centerY.target)) : (this.elapsedSeconds += i, this.centerX.update(i), this.centerY.update(i));
     const n = this.mode === "idle", s = n || this.mode === "moving", o = this.reducedMotion || !n ? 0 : Math.sin(this.elapsedSeconds * F(this.physics.bobFrequency, Ot)) * F(this.physics.bobAmplitude, Dt);
     if (s ? this.setPointTargets(
@@ -774,8 +774,6 @@ class te {
   typewriter = null;
   anchor = null;
   speechId = 0;
-  measuredWidth = 0;
-  measuredHeight = 0;
   currentTextLength = 0;
   autoAdvanceTimer = null;
   get isSpeaking() {
@@ -799,7 +797,7 @@ class te {
     if (this.element === null || this.textElement === null || this.liveRegion === null || this.typewriter === null)
       throw new Error("SpeechBubble must be mounted before it can speak.");
     const i = this.speechId + 1;
-    return this.speechId = i, this.element.hidden = !1, this.liveRegion.textContent = t, this.clearAutoAdvance(), this.currentTextLength = Array.from(t).length, this.element.style.minWidth = "", this.element.style.minHeight = "", this.textElement.textContent = t, this.measure(), this.element.style.minWidth = `${this.measuredWidth}px`, this.element.style.minHeight = `${this.measuredHeight}px`, this.typewriter.play(t).then(() => {
+    return this.speechId = i, this.element.hidden = !1, this.liveRegion.textContent = t, this.clearAutoAdvance(), this.currentTextLength = Array.from(t).length, this.element.style.minWidth = "", this.element.style.minHeight = "", this.textElement.textContent = t, this.element.style.minWidth = `${this.element.offsetWidth}px`, this.element.style.minHeight = `${this.element.offsetHeight}px`, this.typewriter.play(t).then(() => {
       this.speechId === i && (this.clearAutoAdvance(), this.hide());
     });
   }
@@ -814,7 +812,7 @@ class te {
     this.typewriter?.advance();
   }
   destroy() {
-    this.clearAutoAdvance(), this.typewriter?.destroy(), this.element?.removeEventListener("click", this.handleAdvance), this.element?.remove(), this.liveRegion?.remove(), this.element = null, this.textElement = null, this.liveRegion = null, this.typewriter = null, this.anchor = null, this.speechId += 1, this.measuredWidth = 0, this.measuredHeight = 0;
+    this.clearAutoAdvance(), this.typewriter?.destroy(), this.element?.removeEventListener("click", this.handleAdvance), this.element?.remove(), this.liveRegion?.remove(), this.element = null, this.textElement = null, this.liveRegion = null, this.typewriter = null, this.anchor = null, this.speechId += 1;
   }
   handleAdvance = () => {
     this.typewriter?.advance();
@@ -822,7 +820,7 @@ class te {
   reposition() {
     if (this.element === null || this.anchor === null)
       return;
-    const t = this.measuredWidth, i = this.measuredHeight, n = document.documentElement.clientWidth || window.innerWidth, s = document.documentElement.clientHeight || window.innerHeight, o = this.anchor.left + this.anchor.width / 2 - t / 2, r = Math.min(
+    const t = this.element.offsetWidth, i = this.element.offsetHeight, n = document.documentElement.clientWidth || window.innerWidth, s = document.documentElement.clientHeight || window.innerHeight, o = this.anchor.left + this.anchor.width / 2 - t / 2, r = Math.min(
       Math.max(o, this.margin),
       Math.max(this.margin, n - t - this.margin)
     ), a = this.anchor.top - i - this.gap < this.margin, l = a ? this.anchor.bottom + this.gap : this.anchor.top - i - this.gap, c = ["blob-bubble"];
@@ -832,9 +830,6 @@ class te {
       Math.max(4, t - 20)
     );
     this.element.style.setProperty("--blob-tail-left", `${Math.round(u)}px`);
-  }
-  measure() {
-    this.element !== null && (this.measuredWidth = this.element.offsetWidth, this.measuredHeight = this.element.offsetHeight);
   }
   /**
    * The dwell starts only once the line has actually finished typing, so a
@@ -883,8 +878,8 @@ function Ee(e = {}) {
   u.type = "button", u.className = "blob-hit-target", u.setAttribute("aria-label", e.labels?.guide ?? "Blob, your guide"), c.append(u);
   const m = document.createElement("button");
   m.type = "button", m.className = "blob-dismiss-button", m.setAttribute("aria-label", e.labels?.dismiss ?? "Dismiss Blob"), m.append(ue()), c.append(m);
-  const b = new Pt(n, t, i, r, s), T = Xt(e.renderer ?? "canvas2d", r), y = a === null ? null : new te(ye(a, r)), f = new Et(), g = new St();
-  let w = !1, C = null, G = performance.now(), x = null, K = null, D = null, W = null, N = !1, Y = null, P = { x: 0, y: 0 }, d = {
+  const b = new Wt(n, t, i, r, s), T = Xt(e.renderer ?? "canvas2d", r), y = a === null ? null : new te(ye(a, r)), f = new Et(), g = new St();
+  let w = !1, C = null, G = performance.now(), x = null, K = null, D = null, P = null, N = !1, Y = null, W = { x: 0, y: 0 }, d = {
     kind: "idle",
     target: null,
     direction: { x: 0, y: 0 },
@@ -899,7 +894,7 @@ function Ee(e = {}) {
     g.name !== "moving" && g.canTransition("moving") && g.transition("moving");
   }, H = (h, p) => {
     const E = d.target === null || we(d.target, p) > 0.5;
-    d.kind = h, d.attachedElement = h === "attach" || h === "circle" ? d.attachedElement : null, E && (d.target = p, d.direction = { x: p.x - P.x, y: p.y - P.y }, !((h === "attach" || h === "circle") && d.attachEmitted) && (d.landed = !1, j()));
+    d.kind = h, d.attachedElement = h === "attach" || h === "circle" ? d.attachedElement : null, E && (d.target = p, d.direction = { x: p.x - W.x, y: p.y - W.y }, !((h === "attach" || h === "circle") && d.attachEmitted) && (d.landed = !1, j()));
   }, I = () => {
     x?.stop(), x = null;
   }, k = () => {
@@ -920,9 +915,9 @@ function Ee(e = {}) {
       d.kind === "move" && (d.kind = "rest", g.canTransition("idle") && g.transition("idle"), k());
     }
   }, A = (h) => {
-    W !== null ? b.setMovingAt(W) : d.kind === "idle" ? b.setIdleAt(ft()) : d.kind === "rest" && d.target !== null ? b.setIdleAt(d.target) : d.kind !== "circle" && d.target !== null && b.setMovingAt(d.target);
+    P !== null ? b.setMovingAt(P) : d.kind === "idle" ? b.setIdleAt(ft()) : d.kind === "rest" && d.target !== null ? b.setIdleAt(d.target) : d.kind !== "circle" && d.target !== null && b.setMovingAt(d.target);
     const p = b.update(h);
-    P = p.center, T.render(p);
+    W = p.center, T.render(p);
     const E = pe(p, t);
     y?.follow(E), Object.assign(u.style, {
       left: `${Math.round(p.center.x - t)}px`,
@@ -999,7 +994,7 @@ function Ee(e = {}) {
             }
             H("attach", wt(
               S,
-              P,
+              W,
               t + he(Q.gap, 0),
               Q.side
             )), r && A(0);
@@ -1081,10 +1076,10 @@ function Ee(e = {}) {
   const et = new Ct(
     () => N || g.name === "circling" || !g.canTransition("dragged") ? !1 : (I(), g.transition("dragged"), !0),
     (h) => {
-      W = h, A(0);
+      P = h, A(0);
     },
     () => {
-      W = null, g.name === "dragged" && g.transition("idle"), d = { kind: "idle", target: null, direction: { x: 0, y: 0 }, landed: !1, attachedElement: null, attachEmitted: !1 }, k();
+      P = null, g.name === "dragged" && g.transition("idle"), d = { kind: "idle", target: null, direction: { x: 0, y: 0 }, landed: !1, attachedElement: null, attachEmitted: !1 }, k();
     }
   );
   e.draggable !== !1 && et.enable(u);

@@ -27,8 +27,6 @@ export class SpeechBubble {
   private typewriter: Typewriter | null = null;
   private anchor: DOMRectReadOnly | null = null;
   private speechId = 0;
-  private measuredWidth = 0;
-  private measuredHeight = 0;
   private currentTextLength = 0;
   private autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -93,9 +91,8 @@ export class SpeechBubble {
     this.element.style.minWidth = '';
     this.element.style.minHeight = '';
     this.textElement.textContent = text;
-    this.measure();
-    this.element.style.minWidth = `${this.measuredWidth}px`;
-    this.element.style.minHeight = `${this.measuredHeight}px`;
+    this.element.style.minWidth = `${this.element.offsetWidth}px`;
+    this.element.style.minHeight = `${this.element.offsetHeight}px`;
     const speech = this.typewriter.play(text);
     return speech.then(() => {
       if (this.speechId === speechId) {
@@ -135,8 +132,6 @@ export class SpeechBubble {
     this.typewriter = null;
     this.anchor = null;
     this.speechId += 1;
-    this.measuredWidth = 0;
-    this.measuredHeight = 0;
   }
 
   private readonly handleAdvance = (): void => {
@@ -148,8 +143,12 @@ export class SpeechBubble {
       return;
     }
 
-    const width = this.measuredWidth;
-    const height = this.measuredHeight;
+    // Position from the ACTUAL rendered size, never a cached measurement:
+    // if fonts load late or styles change the box, the bubble still sits
+    // exactly `gap` px from Blob. The min-size lock set in say() keeps this
+    // constant while a line types, so nothing moves mid-line.
+    const width = this.element.offsetWidth;
+    const height = this.element.offsetHeight;
     const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
     const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
     const centeredLeft = this.anchor.left + this.anchor.width / 2 - width / 2;
@@ -174,13 +173,6 @@ export class SpeechBubble {
       Math.max(4, width - 20),
     );
     this.element.style.setProperty('--blob-tail-left', `${Math.round(tailLeft)}px`);
-  }
-
-  private measure(): void {
-    if (this.element !== null) {
-      this.measuredWidth = this.element.offsetWidth;
-      this.measuredHeight = this.element.offsetHeight;
-    }
   }
 
   /**
